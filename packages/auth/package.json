@@ -1,0 +1,24 @@
+{
+  "name": "@Aethon/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@Aethon/db": "workspace:*",
+    "@Aethon/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@Aethon/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

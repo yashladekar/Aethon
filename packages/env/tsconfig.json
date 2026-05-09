@@ -1,0 +1,3 @@
+{
+  "extends": "@Aethon/config/tsconfig.base.json"
+}
