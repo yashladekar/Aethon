@@ -10,12 +10,19 @@
   },
   "dependencies": {
     "@Aethon/env": "workspace:*",
+    "@mdx-js/react": "^3.1.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "fumadocs": "^0.0.0",
+    "fumadocs-mdx": "^15.0.2",
     "next": "16.2.6",
+    "next-mdx-remote": "^6.0.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@Aethon/config": "workspace:*",
+    "@Aethon/content-core": "workspace:*",
+    "@Aethon/ui": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

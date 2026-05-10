@@ -1,6 +1,7 @@
 import { topicDifficulties } from "@Aethon/shared";
 import { z } from "zod";
-
+export * from "./loader/get-topics";
+export * from "./loader/get-topic-by-slug";
 export const topicMetadataSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),

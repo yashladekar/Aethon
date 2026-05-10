@@ -11,6 +11,12 @@
   },
   "dependencies": {
     "@Aethon/shared": "workspace:*",
+    "@Aethon/config": "workspace:*",
+    "@orama/orama": "^3.1.18",
+    "@types/node": "^25.6.2",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "reading-time": "^1.5.0",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -1,0 +1,34 @@
+---
+title: useEffect
+description: Learn useEffect deeply
+difficulty: intermediate
+estimatedTime: 30
+tags:
+  - react
+  - hooks
+prerequisites:
+  - closures
+  - rendering
+---
+
+# useEffect
+
+React's synchronization hook.
+
+## Basic Example
+
+```tsx
+useEffect(() => {
+  console.log("Mounted");
+}, []);
+```
+
+## Cleanup
+
+```tsx
+useEffect(() => {
+  return () => {
+    console.log("Cleanup");
+  };
+}, []);
+```
