@@ -41,10 +41,11 @@ packages/
 
 1. Install dependencies with `pnpm install`
 2. Copy environment values from the `apps/*/.env.example` files
-3. Point `apps/server/.env` at a PostgreSQL database
-4. Generate Prisma client artifacts with `pnpm run db:generate`
-5. Push the schema with `pnpm run db:push`
-6. Start the monorepo with `pnpm run dev`
+3. Start PostgreSQL, either with your own instance or `pnpm run db:up`
+4. Point `apps/server/.env` at that PostgreSQL database
+5. Generate Prisma client artifacts with `pnpm run db:generate`
+6. Push the schema with `pnpm run db:push`
+7. Start the monorepo with `pnpm run dev`
 
 Default local ports:
 
@@ -52,6 +53,8 @@ Default local ports:
 - `server`: `http://localhost:3000`
 - `admin`: `http://localhost:3002`
 - `docs`: `http://localhost:3003`
+
+If you use the repo's Docker setup, `docker-compose.yml` starts Postgres 16 on `localhost:5432` with the same credentials already shown in `apps/server/.env.example`.
 
 ## Database Model
 

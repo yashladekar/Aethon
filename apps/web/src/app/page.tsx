@@ -15,6 +15,7 @@ import { trpc } from "@/utils/trpc";
 export default function Home() {
   const healthCheck = useQuery(trpc.healthCheck.queryOptions());
   const overview = useQuery(trpc.platform.overview.queryOptions());
+  const databaseState = overview.data?.database;
 
   const stats = [
     {
@@ -85,6 +86,12 @@ export default function Home() {
                 ? "Loading architecture metrics..."
                 : `${overview.data?.engines.length ?? 0} engine packages are scaffolded for roadmap, graph, lesson, sandbox, adaptive, and AI layers.`}
             </div>
+            {!overview.isLoading && databaseState ? (
+              <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
+                <p className="font-medium text-amber-50">Database bootstrap needed</p>
+                <p>{databaseState.message}</p>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </section>

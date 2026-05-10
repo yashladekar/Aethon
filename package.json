@@ -14,6 +14,8 @@
     "dev:server": "turbo run dev --filter=server",
     "dev:admin": "turbo run dev --filter=@Aethon/admin",
     "dev:docs": "turbo run dev --filter=@Aethon/docs",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
     "db:push": "turbo run db:push --filter=@Aethon/db",
     "db:studio": "turbo run db:studio --filter=@Aethon/db",
     "db:generate": "turbo run db:generate --filter=@Aethon/db",
