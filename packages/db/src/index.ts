@@ -1,4 +1,4 @@
-import { env } from "@Aethon/env/server";
+import { env } from "@aethon/env/server";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "../prisma/generated/client";

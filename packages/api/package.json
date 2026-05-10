@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/api",
+  "name": "@aethon/api",
   "type": "module",
   "exports": {
     ".": {
@@ -13,9 +13,9 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@Aethon/auth": "workspace:*",
-    "@Aethon/db": "workspace:*",
-    "@Aethon/env": "workspace:*",
+    "@aethon/auth": "workspace:*",
+    "@aethon/db": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@prisma/client": "catalog:",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
@@ -24,7 +24,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/express": "catalog:",
     "typescript": "catalog:"
   }

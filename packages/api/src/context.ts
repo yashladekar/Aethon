@@ -1,4 +1,4 @@
-import { auth } from "@Aethon/auth";
+import { auth } from "@aethon/auth";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { fromNodeHeaders } from "better-auth/node";
 

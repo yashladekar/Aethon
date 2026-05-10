@@ -1,4 +1,4 @@
-import prisma from "@Aethon/db";
+import prisma from "@aethon/db";
 
 import { publicProcedure, router } from "../index";
 

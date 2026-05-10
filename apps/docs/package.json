@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/docs",
+  "name": "@aethon/docs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@mdx-js/react": "^3.1.1",
     "@tailwindcss/typography": "^0.5.19",
     "fumadocs": "^0.0.0",
@@ -20,9 +20,9 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
-    "@Aethon/content-core": "workspace:*",
-    "@Aethon/ui": "workspace:*",
+    "@aethon/config": "workspace:*",
+    "@aethon/content-core": "workspace:*",
+    "@aethon/ui": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

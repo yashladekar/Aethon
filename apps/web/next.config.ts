@@ -1,4 +1,4 @@
-import "@Aethon/env/web";
+import "@aethon/env/web";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

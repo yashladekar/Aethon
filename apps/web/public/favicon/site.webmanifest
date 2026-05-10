@@ -1,6 +1,6 @@
 {
-  "name": "Aethon",
-  "short_name": "Aethon",
+  "name": "aethon",
+  "short_name": "aethon",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",

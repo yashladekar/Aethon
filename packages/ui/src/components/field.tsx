@@ -3,9 +3,9 @@
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Label } from "@Aethon/ui/components/label"
-import { Separator } from "@Aethon/ui/components/separator"
+import { cn } from "@aethon/ui/lib/utils"
+import { Label } from "@aethon/ui/components/label"
+import { Separator } from "@aethon/ui/components/separator"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (

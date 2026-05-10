@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge } from "@Aethon/ui/components/badge";
+import { Badge } from "@aethon/ui/components/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@Aethon/ui/components/card";
+} from "@aethon/ui/components/card";
 import { useQuery } from "@tanstack/react-query";
 
 import { trpc } from "@/utils/trpc";

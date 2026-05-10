@@ -26,7 +26,7 @@
       "node"
     ],
     "paths": {
-      "@Aethon/content-core": [
+      "@aethon/content-core": [
         "packages/content-core/src"
       ]
     }

@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge } from "@Aethon/ui/components/badge";
+import { Badge } from "@aethon/ui/components/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@Aethon/ui/components/card";
+} from "@aethon/ui/components/card";
 import { useQuery } from "@tanstack/react-query";
 
 import { trpc } from "@/utils/trpc";
@@ -44,7 +44,7 @@ export default function Home() {
               Interactive Developer Operating System
             </Badge>
             <div className="space-y-3">
-              <CardTitle className="text-4xl tracking-tight">Aethon</CardTitle>
+              <CardTitle className="text-4xl tracking-tight">aethon</CardTitle>
               <CardDescription className="max-w-2xl text-base text-muted-foreground">
                 A graph-first learning platform combining roadmap navigation, adaptive practice,
                 immersive sandboxes, and an AI mentor into one developer workspace.

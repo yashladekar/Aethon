@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/content-core",
+  "name": "@aethon/content-core",
   "type": "module",
   "exports": {
     ".": {
@@ -10,8 +10,8 @@
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/shared": "workspace:*",
-    "@Aethon/config": "workspace:*",
+    "@aethon/shared": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@orama/orama": "^3.1.18",
     "@types/node": "^25.6.2",
     "fast-glob": "^3.3.3",
@@ -20,7 +20,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

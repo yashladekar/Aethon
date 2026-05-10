@@ -1,5 +1,5 @@
-import type { AppRouter } from "@Aethon/api/routers/index";
-import { env } from "@Aethon/env/web";
+import type { AppRouter } from "@aethon/api/routers/index";
+import { env } from "@aethon/env/web";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";

@@ -1,7 +1,7 @@
 import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/navigation-menu"
 import { cva } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronDownIcon } from "lucide-react"
 
 function NavigationMenu({

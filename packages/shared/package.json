@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/shared",
+  "name": "@aethon/shared",
   "type": "module",
   "exports": {
     ".": {
@@ -13,7 +13,7 @@
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

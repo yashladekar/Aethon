@@ -1,6 +1,6 @@
-# Aethon
+# aethon
 
-Aethon is an interactive developer operating system: a graph-first learning platform that blends roadmap navigation, adaptive practice, immersive sandboxes, and an AI mentor.
+aethon is an interactive developer operating system: a graph-first learning platform that blends roadmap navigation, adaptive practice, immersive sandboxes, and an AI mentor.
 
 ## Product Direction
 

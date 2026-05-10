@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../index.css";
 import Header from "@/components/header";
 import Providers from "@/components/providers";
-import { TooltipProvider } from "@Aethon/ui/components/tooltip";
+import { TooltipProvider } from "@aethon/ui/components/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aethon",
-  description: "Aethon",
+  title: "aethon",
+  description: "aethon",
 };
 
 export default function RootLayout({
@@ -30,12 +30,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-         <TooltipProvider>
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
-            {children}
-          </div>
-        </TooltipProvider>
+          <TooltipProvider>
+            <div className="grid grid-rows-[auto_1fr] h-svh">
+              <Header />
+              {children}
+            </div>
+          </TooltipProvider>
         </Providers>
       </body>
     </html>

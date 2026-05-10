@@ -1,5 +1,5 @@
 {
-  "extends": "@Aethon/config/tsconfig.nextjs.json",
+  "extends": "@aethon/config/tsconfig.nextjs.json",
   "compilerOptions": {
     "paths": {
       "@/*": [

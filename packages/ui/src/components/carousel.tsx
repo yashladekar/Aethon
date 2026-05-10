@@ -5,8 +5,8 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 type CarouselApi = UseEmblaCarouselType[1]

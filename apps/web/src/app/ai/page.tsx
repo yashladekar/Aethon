@@ -1,8 +1,8 @@
 "use client";
 
-import { env } from "@Aethon/env/web";
-import { Button } from "@Aethon/ui/components/button";
-import { Input } from "@Aethon/ui/components/input";
+import { env } from "@aethon/env/web";
+import { Button } from "@aethon/ui/components/button";
+import { Input } from "@aethon/ui/components/input";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Send } from "lucide-react";
@@ -42,9 +42,8 @@ export default function AIPage() {
           messages.map((message) => (
             <div
               key={message.id}
-              className={`p-3 rounded-lg ${
-                message.role === "user" ? "bg-primary/10 ml-8" : "bg-secondary/20 mr-8"
-              }`}
+              className={`p-3 rounded-lg ${message.role === "user" ? "bg-primary/10 ml-8" : "bg-secondary/20 mr-8"
+                }`}
             >
               <p className="text-sm font-semibold mb-1">
                 {message.role === "user" ? "You" : "AI Assistant"}

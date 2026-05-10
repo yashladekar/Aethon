@@ -313,6 +313,10 @@ apps/
       favicon.ico
       globals.css
       layout.tsx
+      page.tsx
+    components/
+      mdx-components.tsx
+      mdx-renderer.tsx
     public/
       file.svg
       globe.svg
@@ -584,159 +588,6 @@ turbo.json
 ================================================================
 Files
 ================================================================
-
-================
-File: apps/docs/app/(app)/docs/[[...slug]]/page.tsx
-================
-import { getTopicBySlug } from "@Aethon/content-core";
-
-export default async function DocsPage({
-  params,
-}: {
-  params: Promise<{ slug: string[] }>;
-}) {
-  const { slug } = await params;
-
-  const topic = await getTopicBySlug(slug);
-
-  return (
-    <div>
-      <h1>{topic?.frontmatter.title}</h1>
-    </div>
-  );
-}
-
-================
-File: apps/docs/app/(app)/docs/layout.tsx
-================
-
-
-================
-File: content/frontend/react/hook/use-effect.mdx
-================
----
-title: useEffect
-description: Learn useEffect deeply
-difficulty: intermediate
-estimatedTime: 30
-tags:
-  - react
-  - hooks
-prerequisites:
-  - closures
-  - rendering
----
-
-# useEffect
-
-React's synchronization hook.
-
-================
-File: packages/content-core/src/loader/get-topic-by-slug.ts
-================
-import { getAllTopics } from "./get-topics";
-
-export async function getTopicBySlug(slug: string[]) {
-  const topics = await getAllTopics();
-
-  return topics.find(
-    (topic) => topic.slug === slug.join("/")
-  );
-}
-
-================
-File: packages/content-core/src/loader/get-topics.ts
-================
-import fs from "fs/promises";
-import path from "path";
-
-import { getAllContentFiles } from "./load-topics";
-import { parseTopic } from "../parser/parse-topic";
-
-export async function getAllTopics() {
-  const files = await getAllContentFiles();
-
-  const topics = await Promise.all(
-    files.map(async (file) => {
-      const raw = await fs.readFile(file, "utf8");
-
-      const parsed = parseTopic(raw);
-
-      const slug = file
-        ?.split("content/")[1]
-        ?.replace(/\.mdx$/, "")
-
-      return {
-        slug,
-        path: file,
-        ...parsed,
-      };
-    })
-  );
-
-  return topics;
-}
-
-================
-File: packages/content-core/src/loader/load-topics.ts
-================
-import fg from "fast-glob";
-import fs from "fs/promises";
-import path from "path";
-
-export async function getAllContentFiles() {
-  const files = await fg("content/**/*.mdx", {
-    absolute: true,
-  });
-
-  return files;
-}
-
-================
-File: packages/content-core/src/parser/parse-topic.ts
-================
-import matter from "gray-matter";
-import readingTime from "reading-time";
-
-export function parseTopic(fileContent: string) {
-  const { data, content } = matter(fileContent);
-
-  return {
-    frontmatter: data,
-    content,
-    readingTime: readingTime(content).text,
-  };
-}
-
-================
-File: packages/content-core/src/types/topic.ts
-================
-export interface TopicFrontmatter {
-  title: string;
-  description: string;
-
-  difficulty?: "beginner" | "intermediate" | "advanced";
-
-  estimatedTime?: number;
-
-  tags?: string[];
-
-  prerequisites?: string[];
-
-  relatedTopics?: string[];
-}
-
-export interface Topic {
-  slug: string;
-
-  path: string;
-
-  content: string;
-
-  frontmatter: TopicFrontmatter;
-
-  readingTime: string;
-}
 
 ================
 File: .agents/skills/ai-sdk/references/ai-gateway.md
@@ -29433,7 +29284,7 @@ export default eslintConfig;
 ================
 File: apps/admin/next.config.ts
 ================
-import "@Aethon/env/admin";
+import "@aethon/env/admin";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -29446,7 +29297,7 @@ export default nextConfig;
 File: apps/admin/package.json
 ================
 {
-  "name": "@Aethon/admin",
+  "name": "@aethon/admin",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -29456,13 +29307,13 @@ File: apps/admin/package.json
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -29534,7 +29385,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 File: apps/admin/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.nextjs.json",
+  "extends": "@aethon/config/tsconfig.nextjs.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"]
@@ -29549,6 +29400,62 @@ File: apps/admin/tsconfig.json
     "**/*.mts"
   ],
   "exclude": ["node_modules"]
+}
+
+================
+File: apps/docs/app/(app)/docs/[[...slug]]/page.tsx
+================
+import { notFound } from "next/navigation";
+
+import { getTopicBySlug } from "@aethon/content-core";
+
+import { MDXRenderer } from "@/components/mdx-renderer";
+
+export default async function DocsPage({
+  params,
+}: {
+  params: Promise<{ slug: string[] }>;
+}) {
+  const { slug } = await params;
+
+  const topic = await getTopicBySlug(slug);
+
+  if (!topic) {
+    notFound();
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto py-10 px-6">
+      <div className="mb-10">
+        <p className="text-sm text-muted-foreground mb-2">
+          {topic.frontmatter.difficulty}
+        </p>
+
+        <h1 className="text-5xl font-bold mb-4">
+          {topic.frontmatter.title}
+        </h1>
+
+        <p className="text-lg text-muted-foreground">
+          {topic.frontmatter.description}
+        </p>
+      </div>
+
+      <article className="prose prose-neutral dark:prose-invert max-w-none">
+        <MDXRenderer source={topic.content} />
+      </article>
+    </div>
+  );
+}
+
+================
+File: apps/docs/app/(app)/docs/layout.tsx
+================
+export default function Layout({ children }: LayoutProps<'/'>) {
+    return (
+        <body className="flex flex-col min-h-screen">
+            <div>{children}</div>
+        </body>
+    );
 }
 
 ================
@@ -29615,6 +29522,59 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
+  );
+}
+
+================
+File: apps/docs/components/mdx-components.tsx
+================
+export const mdxComponents = {
+  h1: (props: any) => (
+    <h1
+      className="text-4xl font-bold mb-6"
+      {...props}
+    />
+  ),
+
+  h2: (props: any) => (
+    <h2
+      className="text-3xl font-semibold mt-10 mb-4"
+      {...props}
+    />
+  ),
+
+  p: (props: any) => (
+    <p
+      className="leading-7 mb-4 text-muted-foreground"
+      {...props}
+    />
+  ),
+
+  code: (props: any) => (
+    <code
+      className="bg-muted px-1 py-0.5 rounded text-sm"
+      {...props}
+    />
+  ),
+};
+
+================
+File: apps/docs/components/mdx-renderer.tsx
+================
+import { MDXRemote } from "next-mdx-remote/rsc";
+
+import { mdxComponents } from "./mdx-components";
+
+export function MDXRenderer({
+  source,
+}: {
+  source: string;
+}) {
+  return (
+    <MDXRemote
+      source={source}
+      components={mdxComponents}
+    />
   );
 }
 
@@ -29727,46 +29687,15 @@ export default eslintConfig;
 ================
 File: apps/docs/next.config.ts
 ================
-import "@Aethon/env/docs";
+import "@aethon/env/docs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
+  allowedDevOrigins: ["192.168.1.40"]
 };
 
 export default nextConfig;
-
-================
-File: apps/docs/package.json
-================
-{
-  "name": "@Aethon/docs",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev --port 3003",
-    "build": "next build",
-    "start": "next start",
-    "check-types": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@Aethon/env": "workspace:*",
-    "fumadocs": "^0.0.0",
-    "fumadocs-mdx": "^15.0.2",
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
-  },
-  "devDependencies": {
-    "@Aethon/config": "workspace:*",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
-}
 
 ================
 File: apps/docs/pnpm-workspace.yaml
@@ -29825,37 +29754,6 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-================
-File: apps/docs/tsconfig.json
-================
-{
-  "extends": "@Aethon/config/tsconfig.nextjs.json",
-  "compilerOptions": {
-    "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@Aethon/ui": [
-        "packages/ui/src"
-      ],
-      "@Aethon/content-core": [
-        "packages/content-core/src"
-      ]
-    }
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts",
-    "**/*.mts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
-}
 
 ================
 File: apps/server/.gitignore
@@ -29931,10 +29829,10 @@ File: apps/server/package.json
     "start": "node dist/index.mjs"
   },
   "dependencies": {
-    "@Aethon/api": "workspace:*",
-    "@Aethon/auth": "workspace:*",
-    "@Aethon/db": "workspace:*",
-    "@Aethon/env": "workspace:*",
+    "@aethon/api": "workspace:*",
+    "@aethon/auth": "workspace:*",
+    "@aethon/db": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@ai-sdk/devtools": "^0.0.2",
     "@ai-sdk/google": "^3.0.1",
     "@hono/trpc-server": "^0.4.0",
@@ -29947,7 +29845,7 @@ File: apps/server/package.json
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/cors": "^2.8.17",
     "@types/express": "catalog:",
     "@types/node": "^22.13.14",
@@ -29967,7 +29865,7 @@ export default defineConfig({
   format: "esm",
   outDir: "./dist",
   clean: true,
-  noExternal: [/@Aethon\/.*/],
+  noExternal: [/@aethon\/.*/],
 });
 
 ================
@@ -29984,8 +29882,8 @@ File: apps/web/public/favicon/favicon.svg
 File: apps/web/public/favicon/site.webmanifest
 ================
 {
-  "name": "Aethon",
-  "short_name": "Aethon",
+  "name": "aethon",
+  "short_name": "aethon",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
@@ -30010,9 +29908,9 @@ File: apps/web/src/app/ai/page.tsx
 ================
 "use client";
 
-import { env } from "@Aethon/env/web";
-import { Button } from "@Aethon/ui/components/button";
-import { Input } from "@Aethon/ui/components/input";
+import { env } from "@aethon/env/web";
+import { Button } from "@aethon/ui/components/button";
+import { Input } from "@aethon/ui/components/input";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { Send } from "lucide-react";
@@ -30152,14 +30050,14 @@ File: apps/web/src/app/roadmaps/page.tsx
 ================
 "use client";
 
-import { Badge } from "@Aethon/ui/components/badge";
+import { Badge } from "@aethon/ui/components/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@Aethon/ui/components/card";
+} from "@aethon/ui/components/card";
 import { useQuery } from "@tanstack/react-query";
 
 import { trpc } from "@/utils/trpc";
@@ -30228,8 +30126,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Aethon",
-    short_name: "Aethon",
+    name: "aethon",
+    short_name: "aethon",
     description: "my pwa app",
     start_url: "/new",
     display: "standalone",
@@ -30268,13 +30166,13 @@ File: apps/web/src/components/mode-toggle.tsx
 ================
 "use client";
 
-import { Button } from "@Aethon/ui/components/button";
+import { Button } from "@aethon/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@Aethon/ui/components/dropdown-menu";
+} from "@aethon/ui/components/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";
@@ -30303,7 +30201,7 @@ File: apps/web/src/components/providers.tsx
 ================
 "use client";
 
-import { Toaster } from "@Aethon/ui/components/sonner";
+import { Toaster } from "@aethon/ui/components/sonner";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -30326,9 +30224,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 ================
 File: apps/web/src/components/sign-in-form.tsx
 ================
-import { Button } from "@Aethon/ui/components/button";
-import { Input } from "@Aethon/ui/components/input";
-import { Label } from "@Aethon/ui/components/label";
+import { Button } from "@aethon/ui/components/button";
+import { Input } from "@aethon/ui/components/input";
+import { Label } from "@aethon/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -30461,9 +30359,9 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
 ================
 File: apps/web/src/components/sign-up-form.tsx
 ================
-import { Button } from "@Aethon/ui/components/button";
-import { Input } from "@Aethon/ui/components/input";
-import { Label } from "@Aethon/ui/components/label";
+import { Button } from "@aethon/ui/components/button";
+import { Input } from "@aethon/ui/components/input";
+import { Label } from "@aethon/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -30636,7 +30534,7 @@ export function ThemeProvider({
 ================
 File: apps/web/src/components/user-menu.tsx
 ================
-import { Button } from "@Aethon/ui/components/button";
+import { Button } from "@aethon/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30645,8 +30543,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@Aethon/ui/components/dropdown-menu";
-import { Skeleton } from "@Aethon/ui/components/skeleton";
+} from "@aethon/ui/components/dropdown-menu";
+import { Skeleton } from "@aethon/ui/components/skeleton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -30701,7 +30599,7 @@ export default function UserMenu() {
 ================
 File: apps/web/src/lib/auth-client.ts
 ================
-import { env } from "@Aethon/env/web";
+import { env } from "@aethon/env/web";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({
@@ -30711,8 +30609,8 @@ export const authClient = createAuthClient({
 ================
 File: apps/web/src/utils/trpc.ts
 ================
-import type { AppRouter } from "@Aethon/api/routers/index";
-import { env } from "@Aethon/env/web";
+import type { AppRouter } from "@aethon/api/routers/index";
+import { env } from "@aethon/env/web";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
@@ -30753,7 +30651,7 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
 ================
 File: apps/web/src/index.css
 ================
-@import "@Aethon/ui/globals.css";
+@import "@aethon/ui/globals.css";
 @source "../node_modules/streamdown/dist/*.js";
 
 ================
@@ -30844,8 +30742,8 @@ File: apps/web/components.json
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
-    "utils": "@Aethon/ui/lib/utils",
-    "ui": "@Aethon/ui/components",
+    "utils": "@aethon/ui/lib/utils",
+    "ui": "@aethon/ui/components",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
@@ -30857,7 +30755,7 @@ File: apps/web/components.json
 ================
 File: apps/web/next.config.ts
 ================
-import "@Aethon/env/web";
+import "@aethon/env/web";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -30899,6 +30797,44 @@ File: content/devops/README.md
 Infrastructure, deployment, CI/CD, and operational learning content lives here.
 
 ================
+File: content/frontend/react/hook/use-effect.mdx
+================
+---
+title: useEffect
+description: Learn useEffect deeply
+difficulty: intermediate
+estimatedTime: 30
+tags:
+  - react
+  - hooks
+prerequisites:
+  - closures
+  - rendering
+---
+
+# useEffect
+
+React's synchronization hook.
+
+## Basic Example
+
+```tsx
+useEffect(() => {
+  console.log("Mounted");
+}, []);
+```
+
+## Cleanup
+
+```tsx
+useEffect(() => {
+  return () => {
+    console.log("Cleanup");
+  };
+}, []);
+```
+
+================
 File: content/frontend/README.md
 ================
 # Frontend
@@ -30933,7 +30869,7 @@ export interface RevisionCandidate {
 File: packages/adaptive-engine/package.json
 ================
 {
-  "name": "@Aethon/adaptive-engine",
+  "name": "@aethon/adaptive-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -30944,7 +30880,7 @@ File: packages/adaptive-engine/package.json
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -30953,13 +30889,13 @@ File: packages/adaptive-engine/package.json
 File: packages/adaptive-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
 File: packages/ai-engine/src/index.ts
 ================
-import type { TopicDocument } from "@Aethon/content-core";
+import type { TopicDocument } from "@aethon/content-core";
 
 export interface MentorContext {
   learnerId: string;
@@ -30977,7 +30913,7 @@ export interface QuizGenerationRequest {
 File: packages/ai-engine/package.json
 ================
 {
-  "name": "@Aethon/ai-engine",
+  "name": "@aethon/ai-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -30988,10 +30924,10 @@ File: packages/ai-engine/package.json
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/content-core": "workspace:*"
+    "@aethon/content-core": "workspace:*"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -31000,7 +30936,7 @@ File: packages/ai-engine/package.json
 File: packages/ai-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -31025,7 +30961,7 @@ export interface LearningEvent {
 File: packages/analytics-engine/package.json
 ================
 {
-  "name": "@Aethon/analytics-engine",
+  "name": "@aethon/analytics-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -31036,7 +30972,7 @@ File: packages/analytics-engine/package.json
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -31045,13 +30981,13 @@ File: packages/analytics-engine/package.json
 File: packages/analytics-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
 File: packages/api/src/context.ts
 ================
-import { auth } from "@Aethon/auth";
+import { auth } from "@aethon/auth";
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import { fromNodeHeaders } from "better-auth/node";
 
@@ -31137,8 +31073,8 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 ================
 File: packages/auth/src/index.ts
 ================
-import { createPrismaClient } from "@Aethon/db";
-import { env } from "@Aethon/env/server";
+import { createPrismaClient } from "@aethon/db";
+import { env } from "@aethon/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
@@ -31298,66 +31234,111 @@ File: packages/config/tsconfig.package.json
 }
 
 ================
-File: packages/content-core/src/index.ts
+File: packages/content-core/src/loader/get-topic-by-slug.ts
 ================
-import { topicDifficulties } from "@Aethon/shared";
-import { z } from "zod";
-export * from "./loader/get-topics";
-export * from "./loader/get-topic-by-slug";
-export const topicMetadataSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().min(1),
-  difficulty: z.enum(topicDifficulties),
-  estimatedTime: z.number().int().positive(),
-  prerequisites: z.array(z.string()).default([]),
-  relatedTopics: z.array(z.string()).default([]),
-  tags: z.array(z.string()).default([]),
-  usageContexts: z.array(z.string()).default([]),
-});
+import { getAllTopics } from "./get-topics";
 
-export type TopicMetadata = z.infer<typeof topicMetadataSchema>;
+export async function getTopicBySlug(slug: string[]) {
+  const topics = await getAllTopics();
 
-export interface TopicDocument {
+  return topics.find(
+    (topic) => topic.slug === slug.join("/")
+  );
+}
+
+================
+File: packages/content-core/src/loader/get-topics.ts
+================
+import fs from "fs/promises";
+import path from "path";
+
+import { getAllContentFiles } from "./load-topics";
+import { parseTopic } from "../parser/parse-topic";
+
+export async function getAllTopics() {
+  const files = await getAllContentFiles();
+
+  const topics = await Promise.all(
+    files.map(async (file) => {
+      const raw = await fs.readFile(file, "utf8");
+
+      const parsed = parseTopic(raw);
+
+      const slug = file
+        ?.split("content/")[1]
+        ?.replace(/\.mdx$/, "")
+
+      return {
+        slug,
+        path: file,
+        ...parsed,
+      };
+    })
+  );
+
+  return topics;
+}
+
+================
+File: packages/content-core/src/loader/load-topics.ts
+================
+import fg from "fast-glob";
+import fs from "fs/promises";
+import path from "path";
+
+const CONTENT_PATH = path.join(
+  process.cwd(),
+  "../../content"
+);
+export async function getAllContentFiles() {
+  const files = await fg(`${CONTENT_PATH}/**/*.mdx`)
+  return files;
+}
+
+================
+File: packages/content-core/src/parser/parse-topic.ts
+================
+import matter from "gray-matter";
+import readingTime from "reading-time";
+
+export function parseTopic(fileContent: string) {
+  const { data, content } = matter(fileContent);
+
+  return {
+    frontmatter: data,
+    content,
+    readingTime: readingTime(content).text,
+  };
+}
+
+================
+File: packages/content-core/src/types/topic.ts
+================
+export interface TopicFrontmatter {
+  title: string;
+  description: string;
+
+  difficulty?: "beginner" | "intermediate" | "advanced";
+
+  estimatedTime?: number;
+
+  tags?: string[];
+
+  prerequisites?: string[];
+
+  relatedTopics?: string[];
+}
+
+export interface Topic {
   slug: string;
-  section: "frontend" | "backend" | "devops" | "database" | "system-design";
-  metadata: TopicMetadata;
-  body: string;
-}
 
-================
-File: packages/content-core/package.json
-================
-{
-  "name": "@Aethon/content-core",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    }
-  },
-  "scripts": {
-    "check-types": "tsc -b"
-  },
-  "dependencies": {
-    "@Aethon/shared": "workspace:*",
-    "@orama/orama": "^3.1.18",
-    "@types/node": "^25.6.2",
-    "fast-glob": "^3.3.3",
-    "gray-matter": "^4.0.3",
-    "reading-time": "^1.5.0",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@Aethon/config": "workspace:*",
-    "typescript": "catalog:"
-  }
-}
+  path: string;
 
-================
-File: packages/content-core/tsconfig.json
-================
-{
-  "extends": "@Aethon/config/tsconfig.package.json"
+  content: string;
+
+  frontmatter: TopicFrontmatter;
+
+  readingTime: string;
 }
 
 ================
@@ -31669,7 +31650,7 @@ datasource db {
 ================
 File: packages/db/src/index.ts
 ================
-import { env } from "@Aethon/env/server";
+import { env } from "@aethon/env/server";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 import { PrismaClient } from "../prisma/generated/client";
@@ -31790,7 +31771,7 @@ export { env as webEnv } from "./web";
 ================
 File: packages/graph-engine/src/index.ts
 ================
-import type { GraphReference, GraphRelationship } from "@Aethon/shared";
+import type { GraphReference, GraphRelationship } from "@aethon/shared";
 
 export interface KnowledgeGraph {
   topics: GraphReference[];
@@ -31807,7 +31788,7 @@ export interface GraphHighlightRequest {
 File: packages/graph-engine/package.json
 ================
 {
-  "name": "@Aethon/graph-engine",
+  "name": "@aethon/graph-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -31818,10 +31799,10 @@ File: packages/graph-engine/package.json
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/shared": "workspace:*"
+    "@aethon/shared": "workspace:*"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -31830,13 +31811,13 @@ File: packages/graph-engine/package.json
 File: packages/graph-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
 File: packages/lesson-engine/src/index.ts
 ================
-import type { TopicDocument } from "@Aethon/content-core";
+import type { TopicDocument } from "@aethon/content-core";
 
 export type LessonBlockType =
   | "callout"
@@ -31857,7 +31838,7 @@ export interface LessonWorkspace {
 File: packages/lesson-engine/package.json
 ================
 {
-  "name": "@Aethon/lesson-engine",
+  "name": "@aethon/lesson-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -31868,10 +31849,10 @@ File: packages/lesson-engine/package.json
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/content-core": "workspace:*"
+    "@aethon/content-core": "workspace:*"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -31880,13 +31861,13 @@ File: packages/lesson-engine/package.json
 File: packages/lesson-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
 File: packages/roadmap-engine/src/index.ts
 ================
-import type { RoadmapNodeKind, TopicDifficulty } from "@Aethon/shared";
+import type { RoadmapNodeKind, TopicDifficulty } from "@aethon/shared";
 
 export interface RoadmapNodeDefinition {
   id: string;
@@ -31916,7 +31897,7 @@ export interface RoadmapDocument {
 File: packages/roadmap-engine/package.json
 ================
 {
-  "name": "@Aethon/roadmap-engine",
+  "name": "@aethon/roadmap-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -31927,10 +31908,10 @@ File: packages/roadmap-engine/package.json
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/shared": "workspace:*"
+    "@aethon/shared": "workspace:*"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -31939,7 +31920,7 @@ File: packages/roadmap-engine/package.json
 File: packages/roadmap-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -31958,7 +31939,7 @@ export interface SandboxScenario {
 File: packages/sandbox-engine/package.json
 ================
 {
-  "name": "@Aethon/sandbox-engine",
+  "name": "@aethon/sandbox-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -31969,7 +31950,7 @@ File: packages/sandbox-engine/package.json
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -31978,7 +31959,7 @@ File: packages/sandbox-engine/package.json
 File: packages/sandbox-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -31996,7 +31977,7 @@ export interface SearchDocument {
 File: packages/search-engine/package.json
 ================
 {
-  "name": "@Aethon/search-engine",
+  "name": "@aethon/search-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -32007,7 +31988,7 @@ File: packages/search-engine/package.json
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -32016,7 +31997,7 @@ File: packages/search-engine/package.json
 File: packages/search-engine/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -32060,7 +32041,7 @@ export interface GraphRelationship {
 File: packages/shared/package.json
 ================
 {
-  "name": "@Aethon/shared",
+  "name": "@aethon/shared",
   "type": "module",
   "exports": {
     ".": {
@@ -32074,7 +32055,7 @@ File: packages/shared/package.json
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -32083,7 +32064,7 @@ File: packages/shared/package.json
 File: packages/shared/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -32091,7 +32072,7 @@ File: packages/ui/src/components/accordion.tsx
 ================
 import { Accordion as AccordionPrimitive } from "@base-ui/react/accordion"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 function Accordion({ className, ...props }: AccordionPrimitive.Root.Props) {
@@ -32170,8 +32151,8 @@ File: packages/ui/src/components/alert-dialog.tsx
 import * as React from "react"
 import { AlertDialog as AlertDialogPrimitive } from "@base-ui/react/alert-dialog"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 
 function AlertDialog({ ...props }: AlertDialogPrimitive.Root.Props) {
   return <AlertDialogPrimitive.Root data-slot="alert-dialog" {...props} />
@@ -32359,7 +32340,7 @@ File: packages/ui/src/components/alert.tsx
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 const alertVariants = cva(
   "group/alert relative grid w-full gap-0.5 rounded-none border px-2.5 py-2 text-left text-xs has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
@@ -32439,7 +32420,7 @@ export { Alert, AlertTitle, AlertDescription, AlertAction }
 ================
 File: packages/ui/src/components/aspect-ratio.tsx
 ================
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function AspectRatio({
   ratio,
@@ -32470,7 +32451,7 @@ File: packages/ui/src/components/avatar.tsx
 import * as React from "react"
 import { Avatar as AvatarPrimitive } from "@base-ui/react/avatar"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Avatar({
   className,
@@ -32582,7 +32563,7 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 const badgeVariants = cva(
   "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-none border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
@@ -32638,7 +32619,7 @@ import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
@@ -32767,8 +32748,8 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Separator } from "@Aethon/ui/components/separator"
+import { cn } from "@aethon/ui/lib/utils"
+import { Separator } from "@aethon/ui/components/separator"
 
 const buttonGroupVariants = cva(
   "flex w-fit items-stretch rounded-none *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 has-[select[aria-hidden=true]:last-child]:[&>[data-slot=select-trigger]:last-of-type]:rounded-none [&>[data-slot=select-trigger]:not([class*='w-'])]:w-fit [&>input]:flex-1",
@@ -32864,8 +32845,8 @@ import {
   type Locale,
 } from "react-day-picker"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button, buttonVariants } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button, buttonVariants } from "@aethon/ui/components/button"
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react"
 
 function Calendar({
@@ -33086,8 +33067,8 @@ import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 
 type CarouselApi = UseEmblaCarouselType[1]
@@ -33331,7 +33312,7 @@ import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 import type { TooltipValueType } from "recharts"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const
@@ -33732,14 +33713,14 @@ File: packages/ui/src/components/combobox.tsx
 import * as React from "react"
 import { Combobox as ComboboxPrimitive } from "@base-ui/react"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "@Aethon/ui/components/input-group"
+} from "@aethon/ui/components/input-group"
 import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react"
 
 const Combobox = ComboboxPrimitive.Root
@@ -34033,18 +34014,18 @@ File: packages/ui/src/components/command.tsx
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@Aethon/ui/components/dialog"
+} from "@aethon/ui/components/dialog"
 import {
   InputGroup,
   InputGroupAddon,
-} from "@Aethon/ui/components/input-group"
+} from "@aethon/ui/components/input-group"
 import { SearchIcon, CheckIcon } from "lucide-react"
 
 function Command({
@@ -34233,7 +34214,7 @@ File: packages/ui/src/components/context-menu.tsx
 import * as React from "react"
 import { ContextMenu as ContextMenuPrimitive } from "@base-ui/react/context-menu"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronRightIcon, CheckIcon } from "lucide-react"
 
 function ContextMenu({ ...props }: ContextMenuPrimitive.Root.Props) {
@@ -34508,8 +34489,8 @@ File: packages/ui/src/components/dialog.tsx
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 import { XIcon } from "lucide-react"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
@@ -34679,7 +34660,7 @@ File: packages/ui/src/components/drawer.tsx
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Drawer({
   ...props
@@ -34814,7 +34795,7 @@ File: packages/ui/src/components/empty.tsx
 ================
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Empty({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -34922,9 +34903,9 @@ File: packages/ui/src/components/field.tsx
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Label } from "@Aethon/ui/components/label"
-import { Separator } from "@Aethon/ui/components/separator"
+import { cn } from "@aethon/ui/lib/utils"
+import { Label } from "@aethon/ui/components/label"
+import { Separator } from "@aethon/ui/components/separator"
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
   return (
@@ -35163,7 +35144,7 @@ File: packages/ui/src/components/hover-card.tsx
 
 import { PreviewCard as PreviewCardPrimitive } from "@base-ui/react/preview-card"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function HoverCard({ ...props }: PreviewCardPrimitive.Root.Props) {
   return <PreviewCardPrimitive.Root data-slot="hover-card" {...props} />
@@ -35219,10 +35200,10 @@ File: packages/ui/src/components/input-group.tsx
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
-import { Input } from "@Aethon/ui/components/input"
-import { Textarea } from "@Aethon/ui/components/textarea"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
+import { Input } from "@aethon/ui/components/input"
+import { Textarea } from "@aethon/ui/components/textarea"
 
 function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -35380,7 +35361,7 @@ File: packages/ui/src/components/input-otp.tsx
 import * as React from "react"
 import { OTPInput, OTPInputContext } from "input-otp"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { MinusIcon } from "lucide-react"
 
 function InputOTP({
@@ -35471,8 +35452,8 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Separator } from "@Aethon/ui/components/separator"
+import { cn } from "@aethon/ui/lib/utils"
+import { Separator } from "@aethon/ui/components/separator"
 
 function ItemGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -35671,7 +35652,7 @@ export {
 ================
 File: packages/ui/src/components/kbd.tsx
 ================
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   return (
@@ -35707,7 +35688,7 @@ import * as React from "react"
 import { Menu as MenuPrimitive } from "@base-ui/react/menu"
 import { Menubar as MenubarPrimitive } from "@base-ui/react/menubar"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35722,7 +35703,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@Aethon/ui/components/dropdown-menu"
+} from "@aethon/ui/components/dropdown-menu"
 import { CheckIcon } from "lucide-react"
 
 function Menubar({ className, ...props }: MenubarPrimitive.Props) {
@@ -35984,7 +35965,7 @@ File: packages/ui/src/components/native-select.tsx
 ================
 import * as React from "react"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronDownIcon } from "lucide-react"
 
 type NativeSelectProps = Omit<React.ComponentProps<"select">, "size"> & {
@@ -36050,7 +36031,7 @@ File: packages/ui/src/components/navigation-menu.tsx
 import { NavigationMenu as NavigationMenuPrimitive } from "@base-ui/react/navigation-menu"
 import { cva } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronDownIcon } from "lucide-react"
 
 function NavigationMenu({
@@ -36221,8 +36202,8 @@ File: packages/ui/src/components/pagination.tsx
 ================
 import * as React from "react"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
@@ -36358,7 +36339,7 @@ File: packages/ui/src/components/popover.tsx
 import * as React from "react"
 import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Popover({ ...props }: PopoverPrimitive.Root.Props) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />
@@ -36451,7 +36432,7 @@ File: packages/ui/src/components/progress.tsx
 
 import { Progress as ProgressPrimitive } from "@base-ui/react/progress"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Progress({
   className,
@@ -36539,7 +36520,7 @@ File: packages/ui/src/components/radio-group.tsx
 import { Radio as RadioPrimitive } from "@base-ui/react/radio"
 import { RadioGroup as RadioGroupPrimitive } from "@base-ui/react/radio-group"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function RadioGroup({ className, ...props }: RadioGroupPrimitive.Props) {
   return (
@@ -36580,7 +36561,7 @@ File: packages/ui/src/components/resizable.tsx
 
 import * as ResizablePrimitive from "react-resizable-panels"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function ResizablePanelGroup({
   className,
@@ -36634,7 +36615,7 @@ File: packages/ui/src/components/scroll-area.tsx
 
 import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function ScrollArea({
   className,
@@ -36693,7 +36674,7 @@ File: packages/ui/src/components/select.tsx
 import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
 const Select = SelectPrimitive.Root
@@ -36897,7 +36878,7 @@ File: packages/ui/src/components/separator.tsx
 
 import { Separator as SeparatorPrimitive } from "@base-ui/react/separator"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Separator({
   className,
@@ -36927,8 +36908,8 @@ File: packages/ui/src/components/sheet.tsx
 import * as React from "react"
 import { Dialog as SheetPrimitive } from "@base-ui/react/dialog"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
 import { XIcon } from "lucide-react"
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
@@ -37071,24 +37052,24 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { useIsMobile } from "@Aethon/ui/hooks/use-mobile"
-import { cn } from "@Aethon/ui/lib/utils"
-import { Button } from "@Aethon/ui/components/button"
-import { Input } from "@Aethon/ui/components/input"
-import { Separator } from "@Aethon/ui/components/separator"
+import { useIsMobile } from "@aethon/ui/hooks/use-mobile"
+import { cn } from "@aethon/ui/lib/utils"
+import { Button } from "@aethon/ui/components/button"
+import { Input } from "@aethon/ui/components/input"
+import { Separator } from "@aethon/ui/components/separator"
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "@Aethon/ui/components/sheet"
-import { Skeleton } from "@Aethon/ui/components/skeleton"
+} from "@aethon/ui/components/sheet"
+import { Skeleton } from "@aethon/ui/components/skeleton"
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@Aethon/ui/components/tooltip"
+} from "@aethon/ui/components/tooltip"
 import { PanelLeftIcon } from "lucide-react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
@@ -37793,7 +37774,7 @@ File: packages/ui/src/components/slider.tsx
 ================
 import { Slider as SliderPrimitive } from "@base-ui/react/slider"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Slider({
   className,
@@ -37847,7 +37828,7 @@ export { Slider }
 ================
 File: packages/ui/src/components/spinner.tsx
 ================
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { Loader2Icon } from "lucide-react"
 
 function Spinner({ className, ...props }: React.ComponentProps<"svg">) {
@@ -37865,7 +37846,7 @@ File: packages/ui/src/components/switch.tsx
 
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Switch({
   className,
@@ -37901,7 +37882,7 @@ File: packages/ui/src/components/table.tsx
 
 import * as React from "react"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -38022,7 +38003,7 @@ File: packages/ui/src/components/tabs.tsx
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Tabs({
   className,
@@ -38105,7 +38086,7 @@ File: packages/ui/src/components/textarea.tsx
 ================
 import * as React from "react"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
@@ -38132,8 +38113,8 @@ import { Toggle as TogglePrimitive } from "@base-ui/react/toggle"
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group"
 import { type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
-import { toggleVariants } from "@Aethon/ui/components/toggle"
+import { cn } from "@aethon/ui/lib/utils"
+import { toggleVariants } from "@aethon/ui/components/toggle"
 
 const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & {
@@ -38223,7 +38204,7 @@ File: packages/ui/src/components/toggle.tsx
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 const toggleVariants = cva(
   "group/toggle inline-flex items-center justify-center gap-1 rounded-none text-xs font-medium whitespace-nowrap transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:bg-muted data-[state=on]:bg-muted dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -38271,7 +38252,7 @@ File: packages/ui/src/components/tooltip.tsx
 
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function TooltipProvider({
   delay = 0,
@@ -38523,11 +38504,11 @@ File: packages/ui/components.json
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@Aethon/ui/components",
-    "utils": "@Aethon/ui/lib/utils",
-    "hooks": "@Aethon/ui/hooks",
-    "lib": "@Aethon/ui/lib",
-    "ui": "@Aethon/ui/components"
+    "components": "@aethon/ui/components",
+    "utils": "@aethon/ui/lib/utils",
+    "hooks": "@aethon/ui/hooks",
+    "lib": "@aethon/ui/lib",
+    "ui": "@aethon/ui/components"
   },
   "menuColor": "default",
   "menuAccent": "subtle",
@@ -38547,12 +38528,12 @@ export default {
 File: packages/ui/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.base.json",
+  "extends": "@aethon/config/tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "paths": {
-      "@Aethon/ui/*": ["./src/*"]
+      "@aethon/ui/*": ["./src/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
@@ -38660,7 +38641,7 @@ File: bts.jsonc
   "$schema": "https://r2.better-t-stack.dev/schema.json",
   "version": "3.28.0",
   "createdAt": "2026-05-09T17:23:18.763Z",
-  "reproducibleCommand": "pnpm create better-t-stack@latest Aethon --frontend next --backend express --runtime node --database postgres --orm prisma --api trpc --auth better-auth --payments none --addons mcp pwa skills turborepo --examples ai todo --db-setup none --web-deploy none --server-deploy none --git --package-manager pnpm --install",
+  "reproducibleCommand": "pnpm create better-t-stack@latest aethon --frontend next --backend express --runtime node --database postgres --orm prisma --api trpc --auth better-auth --payments none --addons mcp pwa skills turborepo --examples ai todo --db-setup none --web-deploy none --server-deploy none --git --package-manager pnpm --install",
   "database": "postgres",
   "orm": "prisma",
   "backend": "express",
@@ -38798,12 +38779,87 @@ File: turbo.json
 }
 
 ================
+File: apps/docs/app/page.tsx
+================
+import React from 'react'
+
+function page() {
+    return (
+        <div>hello</div>
+    )
+}
+
+export default page
+
+================
+File: apps/docs/package.json
+================
+{
+  "name": "@aethon/docs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3003",
+    "build": "next build",
+    "start": "next start",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aethon/env": "workspace:*",
+    "@mdx-js/react": "^3.1.1",
+    "@tailwindcss/typography": "^0.5.19",
+    "fumadocs": "^0.0.0",
+    "fumadocs-mdx": "^15.0.2",
+    "next": "16.2.6",
+    "next-mdx-remote": "^6.0.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@aethon/config": "workspace:*",
+    "@aethon/content-core": "workspace:*",
+    "@aethon/ui": "workspace:*",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+================
+File: apps/docs/tsconfig.json
+================
+{
+  "extends": "@aethon/config/tsconfig.nextjs.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+================
 File: apps/server/src/index.ts
 ================
-import { createContext } from "@Aethon/api/context";
-import { appRouter } from "@Aethon/api/routers/index";
-import { auth } from "@Aethon/auth";
-import { env } from "@Aethon/env/server";
+import { createContext } from "@aethon/api/context";
+import { appRouter } from "@aethon/api/routers/index";
+import { auth } from "@aethon/auth";
+import { env } from "@aethon/env/server";
 import { devToolsMiddleware } from "@ai-sdk/devtools";
 import { google } from "@ai-sdk/google";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -38867,7 +38923,7 @@ app.listen(3000, () => {
 File: apps/server/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.node.json",
+  "extends": "@aethon/config/tsconfig.node.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]
@@ -38908,7 +38964,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../index.css";
 import Header from "@/components/header";
 import Providers from "@/components/providers";
-import { TooltipProvider } from "@Aethon/ui/components/tooltip";
+import { TooltipProvider } from "@aethon/ui/components/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38921,8 +38977,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aethon",
-  description: "Aethon",
+  title: "aethon",
+  description: "aethon",
 };
 
 export default function RootLayout({
@@ -39000,19 +39056,24 @@ File: apps/web/package.json
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@Aethon/api": "workspace:*",
-    "@Aethon/env": "workspace:*",
-    "@Aethon/ui": "workspace:*",
+    "@aethon/api": "workspace:*",
+    "@aethon/env": "workspace:*",
+    "@aethon/ui": "workspace:*",
     "@ai-sdk/react": "^3.0.3",
+    "@codesandbox/sandpack-react": "^2.20.0",
+    "@monaco-editor/react": "^4.7.0",
     "@tanstack/react-form": "^1.28.0",
     "@tanstack/react-query": "^5.90.12",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "@trpc/tanstack-react-query": "^11.16.0",
+    "@xyflow/react": "^12.10.2",
     "ai": "catalog:",
     "babel-plugin-react-compiler": "^1.0.0",
     "better-auth": "catalog:",
+    "d3": "^7.9.0",
     "dotenv": "catalog:",
+    "elkjs": "^0.11.1",
     "lucide-react": "catalog:",
     "next": "^16.2.0",
     "next-themes": "catalog:",
@@ -39020,10 +39081,13 @@ File: apps/web/package.json
     "react-dom": "catalog:",
     "sonner": "catalog:",
     "streamdown": "^1.6.10",
-    "zod": "catalog:"
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0",
+    "zod": "catalog:",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/react-query-devtools": "^5.91.1",
     "@types/node": "^20",
@@ -39038,11 +39102,11 @@ File: apps/web/package.json
 File: apps/web/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.nextjs.json",
+  "extends": "@aethon/config/tsconfig.nextjs.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@Aethon/ui/*": ["../../packages/ui/src/*"]
+      "@aethon/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "include": [
@@ -39077,7 +39141,7 @@ export type AppRouter = typeof appRouter;
 ================
 File: packages/api/src/routers/platform.ts
 ================
-import prisma from "@Aethon/db";
+import prisma from "@aethon/db";
 
 import { publicProcedure, router } from "../index";
 
@@ -39230,7 +39294,7 @@ export const platformRouter = router({
 File: packages/api/package.json
 ================
 {
-  "name": "@Aethon/api",
+  "name": "@aethon/api",
   "type": "module",
   "exports": {
     ".": {
@@ -39244,9 +39308,9 @@ File: packages/api/package.json
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@Aethon/auth": "workspace:*",
-    "@Aethon/db": "workspace:*",
-    "@Aethon/env": "workspace:*",
+    "@aethon/auth": "workspace:*",
+    "@aethon/db": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@prisma/client": "catalog:",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
@@ -39255,7 +39319,7 @@ File: packages/api/package.json
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/express": "catalog:",
     "typescript": "catalog:"
   }
@@ -39265,7 +39329,7 @@ File: packages/api/package.json
 File: packages/api/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.base.json",
+  "extends": "@aethon/config/tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true
   }
@@ -39275,7 +39339,7 @@ File: packages/api/tsconfig.json
 File: packages/auth/package.json
 ================
 {
-  "name": "@Aethon/auth",
+  "name": "@aethon/auth",
   "type": "module",
   "exports": {
     ".": {
@@ -39289,14 +39353,14 @@ File: packages/auth/package.json
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/db": "workspace:*",
-    "@Aethon/env": "workspace:*",
+    "@aethon/db": "workspace:*",
+    "@aethon/env": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
@@ -39305,14 +39369,14 @@ File: packages/auth/package.json
 File: packages/auth/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
 File: packages/config/package.json
 ================
 {
-  "name": "@Aethon/config",
+  "name": "@aethon/config",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -39328,41 +39392,67 @@ File: packages/config/package.json
 }
 
 ================
-File: packages/config/tsconfig.base.json
+File: packages/content-core/src/index.ts
+================
+import { topicDifficulties } from "@aethon/shared";
+import { z } from "zod";
+export * from "./loader/get-topics";
+export * from "./loader/get-topic-by-slug";
+export const topicMetadataSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  difficulty: z.enum(topicDifficulties),
+  estimatedTime: z.number().int().positive(),
+  prerequisites: z.array(z.string()).default([]),
+  relatedTopics: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]),
+  usageContexts: z.array(z.string()).default([]),
+});
+
+export type TopicMetadata = z.infer<typeof topicMetadataSchema>;
+
+export interface TopicDocument {
+  slug: string;
+  section: "frontend" | "backend" | "devops" | "database" | "system-design";
+  metadata: TopicMetadata;
+  body: string;
+}
+
+================
+File: packages/content-core/package.json
 ================
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": [
-      "ESNext"
-    ],
-    "moduleDetection": "force",
-    "verbatimModuleSyntax": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noUncheckedIndexedAccess": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "types": [
-      "node"
-    ],
-    "paths": {
-      "@Aethon/content-core": [
-        "packages/content-core/src"
-      ]
+  "name": "@aethon/content-core",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
     }
+  },
+  "scripts": {
+    "check-types": "tsc -b"
+  },
+  "dependencies": {
+    "@aethon/shared": "workspace:*",
+    "@aethon/config": "workspace:*",
+    "@orama/orama": "^3.1.18",
+    "@types/node": "^25.6.2",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "reading-time": "^1.5.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@aethon/config": "workspace:*",
+    "typescript": "catalog:"
   }
+}
+
+================
+File: packages/content-core/tsconfig.json
+================
+{
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -39440,7 +39530,7 @@ model Verification {
 File: packages/db/package.json
 ================
 {
-  "name": "@Aethon/db",
+  "name": "@aethon/db",
   "type": "module",
   "exports": {
     ".": {
@@ -39459,7 +39549,7 @@ File: packages/db/package.json
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "catalog:",
     "dotenv": "catalog:",
@@ -39467,7 +39557,7 @@ File: packages/db/package.json
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/pg": "^8.16.0",
     "prisma": "^7.7.0",
     "typescript": "catalog:"
@@ -39478,7 +39568,7 @@ File: packages/db/package.json
 File: packages/db/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -39523,7 +39613,7 @@ export const env = createEnv({
 File: packages/env/package.json
 ================
 {
-  "name": "@Aethon/env",
+  "name": "@aethon/env",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -39544,7 +39634,7 @@ File: packages/env/package.json
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/node": "^22.13.14",
     "typescript": "catalog:"
   }
@@ -39554,7 +39644,7 @@ File: packages/env/package.json
 File: packages/env/tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json"
 }
 
 ================
@@ -39563,7 +39653,7 @@ File: packages/ui/src/components/button.tsx
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding text-xs font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-1 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-1 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -39622,7 +39712,7 @@ File: packages/ui/src/components/card.tsx
 ================
 import * as React from "react"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Card({
   className,
@@ -39731,7 +39821,7 @@ File: packages/ui/src/components/checkbox.tsx
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { CheckIcon } from "lucide-react"
 
 function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
@@ -39765,7 +39855,7 @@ File: packages/ui/src/components/dropdown-menu.tsx
 import * as React from "react"
 import { Menu as MenuPrimitive } from "@base-ui/react/menu"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import { ChevronRightIcon, CheckIcon } from "lucide-react"
 
 function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
@@ -40035,7 +40125,7 @@ File: packages/ui/src/components/input.tsx
 import * as React from "react"
 import { Input as InputPrimitive } from "@base-ui/react/input"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (
@@ -40060,7 +40150,7 @@ File: packages/ui/src/components/label.tsx
 
 import * as React from "react"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Label({ className, ...props }: React.ComponentProps<"label">) {
   return (
@@ -40080,7 +40170,7 @@ export { Label }
 ================
 File: packages/ui/src/components/skeleton.tsx
 ================
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
   return (
@@ -40154,7 +40244,7 @@ export { Toaster }
 File: packages/ui/package.json
 ================
 {
-  "name": "@Aethon/ui",
+  "name": "@aethon/ui",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -40190,7 +40280,7 @@ File: packages/ui/package.json
     "vaul": "^1.1.2"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "tailwindcss": "catalog:",
@@ -40228,7 +40318,7 @@ catalog:
 File: tsconfig.json
 ================
 {
-  "extends": "@Aethon/config/tsconfig.node.json"
+  "extends": "@aethon/config/tsconfig.node.json"
 }
 
 ================
@@ -40236,14 +40326,14 @@ File: apps/web/src/app/page.tsx
 ================
 "use client";
 
-import { Badge } from "@Aethon/ui/components/badge";
+import { Badge } from "@aethon/ui/components/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@Aethon/ui/components/card";
+} from "@aethon/ui/components/card";
 import { useQuery } from "@tanstack/react-query";
 
 import { trpc } from "@/utils/trpc";
@@ -40280,7 +40370,7 @@ export default function Home() {
               Interactive Developer Operating System
             </Badge>
             <div className="space-y-3">
-              <CardTitle className="text-4xl tracking-tight">Aethon</CardTitle>
+              <CardTitle className="text-4xl tracking-tight">aethon</CardTitle>
               <CardDescription className="max-w-2xl text-base text-muted-foreground">
                 A graph-first learning platform combining roadmap navigation, adaptive practice,
                 immersive sandboxes, and an AI mentor into one developer workspace.
@@ -40374,10 +40464,48 @@ export default function Home() {
 }
 
 ================
+File: packages/config/tsconfig.base.json
+================
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": [
+      "ESNext"
+    ],
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@aethon/content-core": [
+        "packages/content-core/src"
+      ]
+    }
+  }
+}
+
+================
 File: package.json
 ================
 {
-  "name": "Aethon",
+  "name": "aethon",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -40390,22 +40518,22 @@ File: package.json
     "check-types": "turbo run check-types",
     "dev:web": "turbo run dev --filter=web",
     "dev:server": "turbo run dev --filter=server",
-    "dev:admin": "turbo run dev --filter=@Aethon/admin",
-    "dev:docs": "turbo run dev --filter=@Aethon/docs",
+    "dev:admin": "turbo run dev --filter=@aethon/admin",
+    "dev:docs": "turbo run dev --filter=@aethon/docs",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
-    "db:push": "turbo run db:push --filter=@Aethon/db",
-    "db:studio": "turbo run db:studio --filter=@Aethon/db",
-    "db:generate": "turbo run db:generate --filter=@Aethon/db",
-    "db:migrate": "turbo run db:migrate --filter=@Aethon/db"
+    "db:push": "turbo run db:push --filter=@aethon/db",
+    "db:studio": "turbo run db:studio --filter=@aethon/db",
+    "db:generate": "turbo run db:generate --filter=@aethon/db",
+    "db:migrate": "turbo run db:migrate --filter=@aethon/db"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/node": "^22.13.14",
     "turbo": "^2.8.12",
     "typescript": "catalog:"
@@ -40416,9 +40544,9 @@ File: package.json
 ================
 File: README.md
 ================
-# Aethon
+# aethon
 
-Aethon is an interactive developer operating system: a graph-first learning platform that blends roadmap navigation, adaptive practice, immersive sandboxes, and an AI mentor.
+aethon is an interactive developer operating system: a graph-first learning platform that blends roadmap navigation, adaptive practice, immersive sandboxes, and an AI mentor.
 
 ## Product Direction
 

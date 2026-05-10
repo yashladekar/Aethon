@@ -12,11 +12,11 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@Aethon/ui/components",
-    "utils": "@Aethon/ui/lib/utils",
-    "hooks": "@Aethon/ui/hooks",
-    "lib": "@Aethon/ui/lib",
-    "ui": "@Aethon/ui/components"
+    "components": "@aethon/ui/components",
+    "utils": "@aethon/ui/lib/utils",
+    "hooks": "@aethon/ui/hooks",
+    "lib": "@aethon/ui/lib",
+    "ui": "@aethon/ui/components"
   },
   "menuColor": "default",
   "menuAccent": "subtle",

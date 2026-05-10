@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/admin",
+  "name": "@aethon/admin",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,13 +9,13 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "next": "16.2.6",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -1,4 +1,4 @@
-import type { TopicDocument } from "@Aethon/content-core";
+import type { TopicDocument } from "@aethon/content-core";
 
 export interface MentorContext {
   learnerId: string;

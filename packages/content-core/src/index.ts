@@ -1,4 +1,4 @@
-import { topicDifficulties } from "@Aethon/shared";
+import { topicDifficulties } from "@aethon/shared";
 import { z } from "zod";
 export * from "./loader/get-topics";
 export * from "./loader/get-topic-by-slug";

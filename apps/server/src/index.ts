@@ -1,7 +1,7 @@
-import { createContext } from "@Aethon/api/context";
-import { appRouter } from "@Aethon/api/routers/index";
-import { auth } from "@Aethon/auth";
-import { env } from "@Aethon/env/server";
+import { createContext } from "@aethon/api/context";
+import { appRouter } from "@aethon/api/routers/index";
+import { auth } from "@aethon/auth";
+import { env } from "@aethon/env/server";
 import { devToolsMiddleware } from "@ai-sdk/devtools";
 import { google } from "@ai-sdk/google";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";

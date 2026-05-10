@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getTopicBySlug } from "@Aethon/content-core";
+import { getTopicBySlug } from "@aethon/content-core";
 
 import { MDXRenderer } from "@/components/mdx-renderer";
 

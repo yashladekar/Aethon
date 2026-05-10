@@ -1,4 +1,4 @@
-import type { RoadmapNodeKind, TopicDifficulty } from "@Aethon/shared";
+import type { RoadmapNodeKind, TopicDifficulty } from "@aethon/shared";
 
 export interface RoadmapNodeDefinition {
   id: string;

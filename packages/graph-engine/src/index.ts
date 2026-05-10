@@ -1,4 +1,4 @@
-import type { GraphReference, GraphRelationship } from "@Aethon/shared";
+import type { GraphReference, GraphRelationship } from "@aethon/shared";
 
 export interface KnowledgeGraph {
   topics: GraphReference[];

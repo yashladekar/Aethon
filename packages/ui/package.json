@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/ui",
+  "name": "@aethon/ui",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -35,7 +35,7 @@
     "vaul": "^1.1.2"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "tailwindcss": "catalog:",

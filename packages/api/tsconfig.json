@@ -1,5 +1,5 @@
 {
-  "extends": "@Aethon/config/tsconfig.base.json",
+  "extends": "@aethon/config/tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true
   }

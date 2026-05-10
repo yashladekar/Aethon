@@ -1,5 +1,5 @@
-import { createPrismaClient } from "@Aethon/db";
-import { env } from "@Aethon/env/server";
+import { createPrismaClient } from "@aethon/db";
+import { env } from "@aethon/env/server";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 

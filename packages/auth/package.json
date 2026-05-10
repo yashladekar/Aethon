@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/auth",
+  "name": "@aethon/auth",
   "type": "module",
   "exports": {
     ".": {
@@ -13,14 +13,14 @@
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/db": "workspace:*",
-    "@Aethon/env": "workspace:*",
+    "@aethon/db": "workspace:*",
+    "@aethon/env": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

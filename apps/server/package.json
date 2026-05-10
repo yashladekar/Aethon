@@ -10,10 +10,10 @@
     "start": "node dist/index.mjs"
   },
   "dependencies": {
-    "@Aethon/api": "workspace:*",
-    "@Aethon/auth": "workspace:*",
-    "@Aethon/db": "workspace:*",
-    "@Aethon/env": "workspace:*",
+    "@aethon/api": "workspace:*",
+    "@aethon/auth": "workspace:*",
+    "@aethon/db": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@ai-sdk/devtools": "^0.0.2",
     "@ai-sdk/google": "^3.0.1",
     "@hono/trpc-server": "^0.4.0",
@@ -26,7 +26,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/cors": "^2.8.17",
     "@types/express": "catalog:",
     "@types/node": "^22.13.14",

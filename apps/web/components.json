@@ -13,8 +13,8 @@
   "iconLibrary": "lucide",
   "aliases": {
     "components": "@/components",
-    "utils": "@Aethon/ui/lib/utils",
-    "ui": "@Aethon/ui/components",
+    "utils": "@aethon/ui/lib/utils",
+    "ui": "@aethon/ui/components",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },

@@ -1,6 +1,6 @@
-import { Button } from "@Aethon/ui/components/button";
-import { Input } from "@Aethon/ui/components/input";
-import { Label } from "@Aethon/ui/components/label";
+import { Button } from "@aethon/ui/components/button";
+import { Input } from "@aethon/ui/components/input";
+import { Label } from "@aethon/ui/components/label";
 import { useForm } from "@tanstack/react-form";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";

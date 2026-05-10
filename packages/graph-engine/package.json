@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/graph-engine",
+  "name": "@aethon/graph-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -10,10 +10,10 @@
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/shared": "workspace:*"
+    "@aethon/shared": "workspace:*"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

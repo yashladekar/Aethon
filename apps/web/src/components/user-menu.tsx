@@ -1,4 +1,4 @@
-import { Button } from "@Aethon/ui/components/button";
+import { Button } from "@aethon/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,8 +7,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@Aethon/ui/components/dropdown-menu";
-import { Skeleton } from "@Aethon/ui/components/skeleton";
+} from "@aethon/ui/components/dropdown-menu";
+import { Skeleton } from "@aethon/ui/components/skeleton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 

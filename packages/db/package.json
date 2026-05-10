@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/db",
+  "name": "@aethon/db",
   "type": "module",
   "exports": {
     ".": {
@@ -18,7 +18,7 @@
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "catalog:",
     "dotenv": "catalog:",
@@ -26,7 +26,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/pg": "^8.16.0",
     "prisma": "^7.7.0",
     "typescript": "catalog:"

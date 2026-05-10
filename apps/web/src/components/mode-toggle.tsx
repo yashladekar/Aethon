@@ -1,12 +1,12 @@
 "use client";
 
-import { Button } from "@Aethon/ui/components/button";
+import { Button } from "@aethon/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@Aethon/ui/components/dropdown-menu";
+} from "@aethon/ui/components/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import * as React from "react";

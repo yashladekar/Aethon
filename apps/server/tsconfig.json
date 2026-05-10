@@ -1,8 +1,10 @@
 {
-  "extends": "@Aethon/config/tsconfig.node.json",
+  "extends": "@aethon/config/tsconfig.node.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "jsx": "react-jsx"
   }

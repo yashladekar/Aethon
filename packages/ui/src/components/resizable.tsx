@@ -2,7 +2,7 @@
 
 import * as ResizablePrimitive from "react-resizable-panels"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 
 function ResizablePanelGroup({
   className,

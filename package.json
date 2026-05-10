@@ -1,5 +1,5 @@
 {
-  "name": "Aethon",
+  "name": "aethon",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -12,22 +12,22 @@
     "check-types": "turbo run check-types",
     "dev:web": "turbo run dev --filter=web",
     "dev:server": "turbo run dev --filter=server",
-    "dev:admin": "turbo run dev --filter=@Aethon/admin",
-    "dev:docs": "turbo run dev --filter=@Aethon/docs",
+    "dev:admin": "turbo run dev --filter=@aethon/admin",
+    "dev:docs": "turbo run dev --filter=@aethon/docs",
     "db:up": "docker compose up -d db",
     "db:down": "docker compose down",
-    "db:push": "turbo run db:push --filter=@Aethon/db",
-    "db:studio": "turbo run db:studio --filter=@Aethon/db",
-    "db:generate": "turbo run db:generate --filter=@Aethon/db",
-    "db:migrate": "turbo run db:migrate --filter=@Aethon/db"
+    "db:push": "turbo run db:push --filter=@aethon/db",
+    "db:studio": "turbo run db:studio --filter=@aethon/db",
+    "db:generate": "turbo run db:generate --filter=@aethon/db",
+    "db:migrate": "turbo run db:migrate --filter=@aethon/db"
   },
   "dependencies": {
-    "@Aethon/env": "workspace:*",
+    "@aethon/env": "workspace:*",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "@types/node": "^22.13.14",
     "turbo": "^2.8.12",
     "typescript": "catalog:"

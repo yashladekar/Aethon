@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/roadmap-engine",
+  "name": "@aethon/roadmap-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -10,10 +10,10 @@
     "check-types": "tsc -b"
   },
   "dependencies": {
-    "@Aethon/shared": "workspace:*"
+    "@aethon/shared": "workspace:*"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }

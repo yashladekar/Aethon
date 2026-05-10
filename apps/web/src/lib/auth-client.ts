@@ -1,4 +1,4 @@
-import { env } from "@Aethon/env/web";
+import { env } from "@aethon/env/web";
 import { createAuthClient } from "better-auth/react";
 
 export const authClient = createAuthClient({

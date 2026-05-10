@@ -3,18 +3,18 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
 
-import { cn } from "@Aethon/ui/lib/utils"
+import { cn } from "@aethon/ui/lib/utils"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@Aethon/ui/components/dialog"
+} from "@aethon/ui/components/dialog"
 import {
   InputGroup,
   InputGroupAddon,
-} from "@Aethon/ui/components/input-group"
+} from "@aethon/ui/components/input-group"
 import { SearchIcon, CheckIcon } from "lucide-react"
 
 function Command({

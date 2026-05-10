@@ -1,5 +1,5 @@
 {
-  "name": "@Aethon/search-engine",
+  "name": "@aethon/search-engine",
   "type": "module",
   "exports": {
     ".": {
@@ -10,7 +10,7 @@
     "check-types": "tsc -b"
   },
   "devDependencies": {
-    "@Aethon/config": "workspace:*",
+    "@aethon/config": "workspace:*",
     "typescript": "catalog:"
   }
 }
