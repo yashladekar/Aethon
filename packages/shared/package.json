@@ -1,0 +1,19 @@
+{
+  "name": "@Aethon/shared",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc -b"
+  },
+  "devDependencies": {
+    "@Aethon/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

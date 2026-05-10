@@ -4,8 +4,14 @@
   "private": true,
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
+    "./admin": "./src/admin.ts",
+    "./docs": "./src/docs.ts",
     "./server": "./src/server.ts",
     "./web": "./src/web.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@t3-oss/env-core": "^0.13.1",

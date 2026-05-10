@@ -1,5 +1,5 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
-import { todoRouter } from "./todo";
+import { platformRouter } from "./platform";
 
 export const appRouter = router({
   healthCheck: publicProcedure.query(() => {
@@ -11,6 +11,6 @@ export const appRouter = router({
       user: ctx.session.user,
     };
   }),
-  todo: todoRouter,
+  platform: platformRouter,
 });
 export type AppRouter = typeof appRouter;

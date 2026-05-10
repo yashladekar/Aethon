@@ -34,6 +34,13 @@ app.use(
 app.use(express.json());
 
 app.post("/ai", async (req, res) => {
+  if (!env.GOOGLE_GENERATIVE_AI_API_KEY) {
+    res.status(503).json({
+      error: "AI mentor is not configured yet. Add GOOGLE_GENERATIVE_AI_API_KEY to apps/server/.env.",
+    });
+    return;
+  }
+
   const { messages = [] } = (req.body || {}) as { messages: UIMessage[] };
   const model = wrapLanguageModel({
     model: google("gemini-2.5-flash"),

@@ -1,16 +1,17 @@
 "use client";
 import Link from "next/link";
+import type { Route } from "next";
 
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
 export default function Header() {
-  const links = [
+  const links: ReadonlyArray<{ to: Route; label: string }> = [
     { to: "/", label: "Home" },
+    { to: "/roadmaps", label: "Roadmaps" },
     { to: "/dashboard", label: "Dashboard" },
-    { to: "/todos", label: "Todos" },
     { to: "/ai", label: "AI Chat" },
-  ] as const;
+  ];
 
   return (
     <div>

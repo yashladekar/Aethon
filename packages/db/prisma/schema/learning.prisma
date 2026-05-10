@@ -1,0 +1,288 @@
+enum TopicDifficulty {
+  beginner
+  intermediate
+  advanced
+  expert
+}
+
+enum TopicKind {
+  concept
+  lesson
+  project
+  tool
+  practice
+  system_design
+}
+
+enum TopicStatus {
+  draft
+  published
+  archived
+}
+
+enum TopicRelationType {
+  prerequisite
+  related
+  dependency
+  foundation
+  extends
+  optimizes
+  unlocks
+}
+
+enum RoadmapStatus {
+  draft
+  published
+  archived
+}
+
+enum RoadmapNodeKind {
+  topic
+  milestone
+  checkpoint
+  capstone
+  practice
+  review
+}
+
+enum ProgressStatus {
+  not_started
+  in_progress
+  mastered
+  blocked
+  skipped
+}
+
+enum RecommendationType {
+  next_topic
+  revision
+  exercise
+  project
+  quiz
+  mentor
+}
+
+enum RecommendationStatus {
+  pending
+  surfaced
+  dismissed
+  completed
+}
+
+enum RevisionStatus {
+  pending
+  scheduled
+  completed
+  skipped
+}
+
+model Topic {
+  id                 String           @id @default(cuid())
+  slug               String           @unique
+  title              String
+  description        String?
+  summary            String?
+  difficulty         TopicDifficulty
+  kind               TopicKind        @default(concept)
+  status             TopicStatus      @default(draft)
+  estimatedMinutes   Int?
+  canonicalPath      String?          @unique
+  tags               String[]
+  usageContexts      String[]
+  metadata           Json?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  outgoingRelations  TopicRelation[]  @relation("TopicRelationSource")
+  incomingRelations  TopicRelation[]  @relation("TopicRelationTarget")
+  roadmapNodes       RoadmapNode[]
+  progressRecords    Progress[]
+  quizAttempts       QuizAttempt[]
+  mistakeLogs        MistakeLog[]
+  recommendations    Recommendation[]
+  revisionQueueItems RevisionQueue[]
+
+  @@index([status, difficulty])
+  @@index([kind, status])
+}
+
+model TopicRelation {
+  id            String            @id @default(cuid())
+  sourceTopicId String
+  targetTopicId String
+  type          TopicRelationType
+  strength      Int?
+  rationale     String?
+  metadata      Json?
+  createdAt     DateTime          @default(now())
+  sourceTopic   Topic             @relation("TopicRelationSource", fields: [sourceTopicId], references: [id], onDelete: Cascade)
+  targetTopic   Topic             @relation("TopicRelationTarget", fields: [targetTopicId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceTopicId, targetTopicId, type])
+  @@index([sourceTopicId, type])
+  @@index([targetTopicId, type])
+}
+
+model Roadmap {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  title           String
+  description     String?
+  icon            String?
+  theme           String?
+  status          RoadmapStatus @default(draft)
+  metadata        Json?
+  publishedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  nodes           RoadmapNode[]
+  progressRecords Progress[]
+
+  @@index([status, publishedAt])
+}
+
+model RoadmapNode {
+  id                 String          @id @default(cuid())
+  roadmapId          String
+  topicId            String?
+  parentNodeId       String?
+  key                String
+  label              String
+  kind               RoadmapNodeKind @default(topic)
+  sortOrder          Int             @default(0)
+  positionX          Float?
+  positionY          Float?
+  estimatedMinutes   Int?
+  metadata           Json?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  roadmap            Roadmap         @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  topic              Topic?          @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  parentNode         RoadmapNode?    @relation("RoadmapNodeTree", fields: [parentNodeId], references: [id], onDelete: SetNull)
+  childNodes         RoadmapNode[]   @relation("RoadmapNodeTree")
+  progressRecords    Progress[]
+  quizAttempts       QuizAttempt[]
+  mistakeLogs        MistakeLog[]
+  revisionQueueItems RevisionQueue[]
+
+  @@unique([roadmapId, key])
+  @@index([roadmapId, sortOrder])
+  @@index([topicId])
+}
+
+model Progress {
+  id                String         @id @default(cuid())
+  userId            String
+  topicId           String
+  roadmapId         String?
+  roadmapNodeId     String?
+  status            ProgressStatus @default(not_started)
+  masteryScore      Int            @default(0)
+  completionPercent Int            @default(0)
+  attemptsCount     Int            @default(0)
+  streakCount       Int            @default(0)
+  startedAt         DateTime?
+  completedAt       DateTime?
+  lastPracticedAt   DateTime?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  user              User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic             Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  roadmap           Roadmap?       @relation(fields: [roadmapId], references: [id], onDelete: SetNull)
+  roadmapNode       RoadmapNode?   @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, topicId])
+  @@index([userId, status])
+  @@index([roadmapId, roadmapNodeId])
+}
+
+model QuizAttempt {
+  id              String       @id @default(cuid())
+  userId          String
+  topicId         String
+  roadmapNodeId   String?
+  score           Int
+  questionCount   Int
+  correctCount    Int
+  durationSeconds Int?
+  hintsUsed       Int          @default(0)
+  metadata        Json?
+  createdAt       DateTime     @default(now())
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic           Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  roadmapNode     RoadmapNode? @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)
+  mistakeLogs     MistakeLog[]
+
+  @@index([userId, createdAt])
+  @@index([topicId, createdAt])
+}
+
+model MistakeLog {
+  id              String       @id @default(cuid())
+  userId          String
+  topicId         String
+  quizAttemptId   String?
+  roadmapNodeId   String?
+  conceptKey      String
+  prompt          String?
+  submittedAnswer String?
+  expectedAnswer  String?
+  explanation     String?
+  hesitationMs    Int?
+  repeatedCount   Int          @default(1)
+  skipped         Boolean      @default(false)
+  metadata        Json?
+  createdAt       DateTime     @default(now())
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic           Topic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  quizAttempt     QuizAttempt? @relation(fields: [quizAttemptId], references: [id], onDelete: SetNull)
+  roadmapNode     RoadmapNode? @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)
+
+  @@index([userId, topicId, createdAt])
+  @@index([conceptKey])
+}
+
+model Recommendation {
+  id                 String               @id @default(cuid())
+  userId             String
+  topicId            String?
+  type               RecommendationType
+  status             RecommendationStatus @default(pending)
+  title              String
+  summary            String
+  reason             String
+  priority           Int                  @default(50)
+  payload            Json?
+  surfacedAt         DateTime?
+  dismissedAt        DateTime?
+  completedAt        DateTime?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  user               User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic              Topic?               @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  revisionQueueItems RevisionQueue[]
+
+  @@index([userId, status, priority])
+  @@index([topicId, type])
+}
+
+model RevisionQueue {
+  id               String          @id @default(cuid())
+  userId           String
+  topicId          String
+  roadmapNodeId    String?
+  recommendationId String?
+  reason           String
+  priority         Int             @default(50)
+  dueAt            DateTime
+  status           RevisionStatus  @default(pending)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  completedAt      DateTime?
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic            Topic           @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  roadmapNode      RoadmapNode?    @relation(fields: [roadmapNodeId], references: [id], onDelete: SetNull)
+  recommendation   Recommendation? @relation(fields: [recommendationId], references: [id], onDelete: SetNull)
+
+  @@index([userId, status, dueAt])
+  @@index([topicId, dueAt])
+}

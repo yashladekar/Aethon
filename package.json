@@ -7,15 +7,17 @@
   ],
   "type": "module",
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "check-types": "turbo check-types",
-    "dev:web": "turbo -F web dev",
-    "dev:server": "turbo -F server dev",
-    "db:push": "turbo -F @Aethon/db db:push",
-    "db:studio": "turbo -F @Aethon/db db:studio",
-    "db:generate": "turbo -F @Aethon/db db:generate",
-    "db:migrate": "turbo -F @Aethon/db db:migrate"
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "check-types": "turbo run check-types",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:server": "turbo run dev --filter=server",
+    "dev:admin": "turbo run dev --filter=@Aethon/admin",
+    "dev:docs": "turbo run dev --filter=@Aethon/docs",
+    "db:push": "turbo run db:push --filter=@Aethon/db",
+    "db:studio": "turbo run db:studio --filter=@Aethon/db",
+    "db:generate": "turbo run db:generate --filter=@Aethon/db",
+    "db:migrate": "turbo run db:migrate --filter=@Aethon/db"
   },
   "dependencies": {
     "@Aethon/env": "workspace:*",

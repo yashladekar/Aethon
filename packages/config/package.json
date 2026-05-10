@@ -1,5 +1,15 @@
 {
   "name": "@Aethon/config",
   "version": "0.0.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.package.json": "./tsconfig.package.json",
+    "./tsconfig.nextjs.json": "./tsconfig.nextjs.json",
+    "./tsconfig.node.json": "./tsconfig.node.json",
+    "./eslint.base": "./eslint.base.mjs",
+    "./prettier": "./prettier.config.mjs",
+    "./biome": "./biome.jsonc"
+  }
 }

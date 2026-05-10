@@ -1,0 +1,19 @@
+{
+  "name": "@Aethon/lesson-engine",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc -b"
+  },
+  "dependencies": {
+    "@Aethon/content-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@Aethon/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

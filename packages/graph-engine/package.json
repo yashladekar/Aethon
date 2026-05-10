@@ -1,0 +1,19 @@
+{
+  "name": "@Aethon/graph-engine",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc -b"
+  },
+  "dependencies": {
+    "@Aethon/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@Aethon/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
