@@ -151,14 +151,14 @@
 
 ## Phase 7 — tRPC API Expansion
 
-- [ ] 18. Add `topics` tRPC router
+- [x] 18. Add `topics` tRPC router
   - Create `packages/api/src/routers/topics.ts` with:
     - `topicBySlug`: public procedure accepting `{ slug: string }`, returning `TopicDocument | null` from `contentRegistry`
     - `topicsForSearch`: public procedure returning `contentRegistry.getTopicsForSearch()`
   - Register `topics` router in `packages/api/src/routers/index.ts`
   - _Requirements: 20_
 
-- [ ] 19. Add `learning` tRPC router
+- [x] 19. Add `learning` tRPC router
   - Create `packages/api/src/routers/learning.ts` with:
     - `learnerProgress`: protected procedure accepting `{ roadmapId: string }`, returning `Progress[]` for the authenticated user
     - `revisionQueue`: protected procedure returning pending `RevisionQueue` entries ordered by `dueAt`
@@ -170,7 +170,7 @@
 
 ## Phase 8 — Adaptive Engine
 
-- [ ] 20. Implement weakness detection in `packages/adaptive-engine`
+- [-] 20. Implement weakness detection in `packages/adaptive-engine`
   - Create `packages/adaptive-engine/src/weakness-detector.ts` with `getWeaknessSignals(userId: string): Promise<WeaknessSignal[]>` querying `MistakeLog` ordered by `repeatedCount` descending
   - Create `packages/adaptive-engine/src/mistake-tracker.ts` with:
     - `recordQuizAttempt(data: QuizAttemptInput): Promise<void>` — creates `QuizAttempt` record
@@ -178,7 +178,7 @@
   - Export both from `packages/adaptive-engine/src/index.ts`
   - _Requirements: 14_
 
-- [ ] 21. Implement recommendation traversal in `packages/adaptive-engine`
+- [~] 21. Implement recommendation traversal in `packages/adaptive-engine`
   - Create `packages/adaptive-engine/src/recommendation-engine.ts` with `generateRecommendations(userId: string, graph: KnowledgeGraph): Promise<void>`
   - Use `GraphEngine.getRecommendationPath()` to find prerequisite chains for each weakness signal
   - Skip topics where `Progress.status === 'mastered'`
@@ -191,20 +191,20 @@
 
 ## Phase 9 — AI Engine
 
-- [ ] 22. Implement quiz generation in `packages/ai-engine`
+- [~] 22. Implement quiz generation in `packages/ai-engine`
   - Create `packages/ai-engine/src/tools/generate-quiz.ts` using Vercel AI SDK `generateObject` with a Zod schema for `QuizQuestion[]`
   - Define `QuizQuestion` interface: `{ id, prompt, options: string[], correctIndex: number, explanation: string, conceptKey: string, hint?: string }`
   - Implement retry logic: retry once on malformed response, throw descriptive error on second failure
   - _Requirements: 16_
 
-- [ ] 23. Implement tutoring and summaries in `packages/ai-engine`
+- [~] 23. Implement tutoring and summaries in `packages/ai-engine`
   - Create `packages/ai-engine/src/tools/generate-summary.ts` using `generateText` with a 150-word max prompt constraint
   - Create `packages/ai-engine/src/tools/tutor-response.ts` using `streamText`, accepting `MentorContext` to ground the system prompt in the learner's current topic and roadmap
   - Create `packages/ai-engine/src/ai-engine.ts` composing all tools into a single `aiEngine` export
   - Export `aiEngine` from `packages/ai-engine/src/index.ts`
   - _Requirements: 17_
 
-- [ ] 24. Add AI tRPC procedures
+- [~] 24. Add AI tRPC procedures
   - Create `packages/api/src/routers/ai.ts` with:
     - `generateQuiz`: protected procedure accepting `{ topicSlug: string, questionCount: number, includeHints?: boolean }`, calling `aiEngine.generateQuiz`
     - `generateSummary`: protected procedure accepting `{ topicSlug: string }`, calling `aiEngine.generateSummary`
@@ -215,7 +215,7 @@
 
 ## Phase 10 — Search Engine
 
-- [ ] 25. Implement `packages/search-engine`
+- [~] 25. Implement `packages/search-engine`
   - Create `packages/search-engine/src/search-engine.ts` using `@orama/orama` `create`, `insert`, and `search`
   - Define schema with `slug: 'string'`, `title: 'string'`, `description: 'string'`, `tags: 'string[]'`
   - Implement `buildSearchIndex(topics: SearchDocument[]): Promise<void>`
