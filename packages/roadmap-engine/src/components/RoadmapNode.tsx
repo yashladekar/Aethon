@@ -2,7 +2,7 @@
 
 import { Handle, Position, type NodeProps } from '@xyflow/react';
 import type { ProgressStatus } from '@aethon/shared';
-import type { RoadmapNodeDefinition } from '../schema/roadmap-document.schema.js';
+import type { RoadmapNodeDefinition } from '../schema/roadmap-document.schema';
 
 export interface RoadmapNodeData extends Record<string, unknown> {
     label: string;

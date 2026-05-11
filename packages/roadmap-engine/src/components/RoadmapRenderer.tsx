@@ -13,12 +13,12 @@ import {
     MarkerType,
 } from '@xyflow/react';
 import type { ProgressStatus } from '@aethon/shared';
-import type { RoadmapDocument } from '../schema/roadmap-document.schema.js';
-import { computeElkLayout } from '../layout/elk-layout.js';
-import { useRoadmapStore } from '../store/roadmap-store.js';
-import { RoadmapNode, type RoadmapNodeData } from './RoadmapNode.js';
-import { RoadmapEdge } from './RoadmapEdge.js';
-import { RoadmapEmptyState } from './RoadmapEmptyState.js';
+import type { RoadmapDocument } from '../schema/roadmap-document.schema';
+import { computeElkLayout } from '../layout/elk-layout';
+import { useRoadmapStore } from '../store/roadmap-store';
+import { RoadmapNode, type RoadmapNodeData } from './RoadmapNode';
+import { RoadmapEdge } from './RoadmapEdge';
+import { RoadmapEmptyState } from './RoadmapEmptyState';
 
 export interface RoadmapRendererProps {
     document: RoadmapDocument;

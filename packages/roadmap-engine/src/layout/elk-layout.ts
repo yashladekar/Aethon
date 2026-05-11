@@ -1,5 +1,5 @@
 import ELK from 'elkjs/lib/elk.bundled.js';
-import type { RoadmapDocument } from '../schema/roadmap-document.schema.js';
+import type { RoadmapDocument } from '../schema/roadmap-document.schema';
 
 const elk = new ELK();
 

@@ -9,6 +9,11 @@
   "scripts": {
     "check-types": "tsc -b"
   },
+  "dependencies": {
+    "@aethon/db": "workspace:*",
+    "@aethon/graph-engine": "workspace:*",
+    "@aethon/shared": "workspace:*"
+  },
   "devDependencies": {
     "@aethon/config": "workspace:*",
     "typescript": "catalog:"
