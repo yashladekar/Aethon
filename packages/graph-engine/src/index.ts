@@ -1,9 +1,6 @@
-import type { GraphReference, GraphRelationship } from "@aethon/shared";
+export { GraphEngine } from './graph-engine.js';
 
-export interface KnowledgeGraph {
-  topics: GraphReference[];
-  relationships: GraphRelationship[];
-}
+export type { GraphReference, GraphRelationship, KnowledgeGraph } from '@aethon/shared';
 
 export interface GraphHighlightRequest {
   focusTopicId: string;

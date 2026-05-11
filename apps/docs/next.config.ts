@@ -1,9 +1,12 @@
 import "@aethon/env/docs";
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 
 const nextConfig: NextConfig = {
   typedRoutes: true,
-  allowedDevOrigins: ["192.168.1.40"]
+  allowedDevOrigins: ["192.168.1.40"],
 };
 
-export default nextConfig;
+const withMDX = createMDX();
+
+export default withMDX(nextConfig);

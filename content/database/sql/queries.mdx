@@ -1,0 +1,134 @@
+---
+title: SQL Queries Fundamentals
+description: Master the core SQL query syntax — SELECT, WHERE, JOIN, GROUP BY, and ORDER BY — with practical examples using PostgreSQL.
+difficulty: beginner
+estimatedTime: 40
+prerequisites: []
+relatedTopics:
+  - database/sql/indexes
+  - database/sql/transactions
+tags:
+  - sql
+  - database
+  - postgresql
+  - queries
+roadmapIds: []
+usageContexts: []
+---
+
+# SQL Queries Fundamentals
+
+SQL (Structured Query Language) is the standard language for interacting with relational databases. Mastering the core query syntax is the foundation for everything from simple lookups to complex analytics.
+
+## SELECT and FROM
+
+The most basic query retrieves all columns from a table:
+
+```sql
+SELECT * FROM users;
+```
+
+Select specific columns to reduce data transfer:
+
+```sql
+SELECT id, email, created_at FROM users;
+```
+
+## WHERE — Filtering Rows
+
+```sql
+-- Equality
+SELECT * FROM users WHERE status = 'active';
+
+-- Comparison operators
+SELECT * FROM orders WHERE total > 100;
+
+-- Multiple conditions
+SELECT * FROM orders
+WHERE user_id = 42
+  AND created_at > '2024-01-01'
+  AND status != 'cancelled';
+
+-- IN list
+SELECT * FROM products WHERE category IN ('electronics', 'books');
+
+-- LIKE pattern matching
+SELECT * FROM users WHERE email LIKE '%@example.com';
+```
+
+## ORDER BY and LIMIT
+
+```sql
+-- Sort descending, take top 10
+SELECT * FROM orders
+ORDER BY created_at DESC
+LIMIT 10;
+
+-- Pagination with OFFSET
+SELECT * FROM products
+ORDER BY name ASC
+LIMIT 20 OFFSET 40; -- page 3 (0-indexed)
+```
+
+## JOIN — Combining Tables
+
+```sql
+-- INNER JOIN: only rows with matches in both tables
+SELECT u.email, o.id AS order_id, o.total
+FROM users u
+INNER JOIN orders o ON o.user_id = u.id;
+
+-- LEFT JOIN: all users, even those with no orders
+SELECT u.email, COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+GROUP BY u.id, u.email;
+```
+
+## GROUP BY and Aggregate Functions
+
+```sql
+-- Count orders per user
+SELECT user_id, COUNT(*) AS order_count
+FROM orders
+GROUP BY user_id;
+
+-- Sum revenue per month
+SELECT
+  DATE_TRUNC('month', created_at) AS month,
+  SUM(total) AS revenue
+FROM orders
+WHERE status = 'completed'
+GROUP BY 1
+ORDER BY 1;
+```
+
+## HAVING — Filtering Aggregates
+
+`WHERE` filters rows before aggregation; `HAVING` filters after:
+
+```sql
+-- Users with more than 5 orders
+SELECT user_id, COUNT(*) AS order_count
+FROM orders
+GROUP BY user_id
+HAVING COUNT(*) > 5;
+```
+
+## Subqueries
+
+```sql
+-- Find users who have placed at least one order over $500
+SELECT * FROM users
+WHERE id IN (
+  SELECT DISTINCT user_id FROM orders WHERE total > 500
+);
+```
+
+## Key Takeaways
+
+- `SELECT` + `FROM` retrieves data; `WHERE` filters rows.
+- `JOIN` combines related tables; `LEFT JOIN` preserves all rows from the left table.
+- `GROUP BY` + aggregate functions (`COUNT`, `SUM`, `AVG`) compute summaries.
+- `HAVING` filters aggregated results; `WHERE` filters individual rows.
+- Always use `LIMIT` in development to avoid accidentally fetching millions of rows.

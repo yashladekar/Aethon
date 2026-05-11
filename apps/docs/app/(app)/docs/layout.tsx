@@ -1,7 +1,11 @@
-export default function Layout({ children }: LayoutProps<'/'>) {
+import { DocsLayout } from 'fumadocs-ui/layouts/docs';
+import type { ReactNode } from 'react';
+import { source } from '@/lib/source';
+
+export default function Layout({ children }: { children: ReactNode }) {
     return (
-        <body className="flex flex-col min-h-screen">
-            <div>{children}</div>
-        </body>
+        <DocsLayout tree={source.pageTree} nav={{ title: 'Aethon Docs' }}>
+            {children}
+        </DocsLayout>
     );
 }

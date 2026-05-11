@@ -1,0 +1,95 @@
+---
+title: JavaScript Closures
+description: Understand closures — how functions capture and retain access to variables from their enclosing scope, and why they are fundamental to React hooks and async patterns.
+difficulty: intermediate
+estimatedTime: 25
+prerequisites: []
+relatedTopics:
+  - frontend/javascript/scope-and-hoisting
+tags:
+  - javascript
+  - closures
+  - functions
+  - scope
+roadmapIds: []
+usageContexts: []
+---
+
+# JavaScript Closures
+
+A **closure** is a function that retains access to variables from its outer (enclosing) scope even after that outer function has returned. Closures are one of the most powerful — and most misunderstood — features of JavaScript.
+
+## What Is a Closure?
+
+When a function is defined inside another function, the inner function forms a closure over the outer function's variables.
+
+```js
+function makeCounter() {
+  let count = 0;
+
+  return function increment() {
+    count += 1;
+    return count;
+  };
+}
+
+const counter = makeCounter();
+console.log(counter()); // 1
+console.log(counter()); // 2
+console.log(counter()); // 3
+```
+
+`increment` closes over `count`. Even after `makeCounter` has returned, `increment` still has a live reference to `count`.
+
+## Why Closures Matter
+
+Closures enable:
+
+- **Data encapsulation** — private state without classes
+- **Partial application / currying** — pre-filling function arguments
+- **Callbacks and event handlers** — capturing context at the time of definition
+- **React hooks** — `useState`, `useEffect`, and custom hooks all rely on closures
+
+## Closures in Loops — A Classic Gotcha
+
+```js
+// ❌ Bug: all callbacks share the same `i`
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 100);
+}
+// Prints: 3, 3, 3
+
+// ✅ Fix: use `let` (block-scoped) or an IIFE
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 100);
+}
+// Prints: 0, 1, 2
+```
+
+## Closures and React Hooks
+
+React hooks capture values via closures at render time. This is why stale closure bugs occur:
+
+```tsx
+function Timer() {
+  const [count, setCount] = React.useState(0);
+
+  React.useEffect(() => {
+    const id = setInterval(() => {
+      // ⚠️ `count` is captured at the time this effect ran
+      setCount(count + 1);
+    }, 1000);
+    return () => clearInterval(id);
+  }, []); // empty deps — count is always 0 inside the callback
+
+  return <div>{count}</div>;
+}
+```
+
+The fix is to use the functional updater form `setCount(c => c + 1)` or add `count` to the dependency array.
+
+## Key Takeaways
+
+- A closure is a function bundled with its surrounding lexical environment.
+- Closures are created every time a function is defined inside another function.
+- Understanding closures is essential for writing correct React hooks and async code.

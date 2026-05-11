@@ -1,0 +1,116 @@
+---
+title: Async/Await in Node.js
+description: Learn how to write clean asynchronous Node.js code using async/await, handle errors properly, and avoid common pitfalls like sequential awaits in loops.
+difficulty: intermediate
+estimatedTime: 30
+prerequisites:
+  - frontend/javascript/closures
+relatedTopics:
+  - backend/node/event-loop
+tags:
+  - nodejs
+  - async
+  - await
+  - promises
+  - javascript
+roadmapIds: []
+usageContexts: []
+---
+
+# Async/Await in Node.js
+
+`async/await` is syntactic sugar over Promises that makes asynchronous code read like synchronous code. It is the standard pattern for I/O-heavy Node.js applications.
+
+## The Basics
+
+An `async` function always returns a Promise. Inside it, `await` pauses execution until the awaited Promise resolves.
+
+```ts
+async function fetchUser(id: string): Promise<User> {
+  const response = await fetch(`/api/users/${id}`);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
+}
+```
+
+## Error Handling
+
+Use `try/catch` to handle rejections:
+
+```ts
+async function safeLoad(id: string) {
+  try {
+    const user = await fetchUser(id);
+    return user;
+  } catch (err) {
+    console.error('Failed to load user:', err);
+    return null;
+  }
+}
+```
+
+Alternatively, chain `.catch()` on the returned Promise:
+
+```ts
+const user = await fetchUser(id).catch(() => null);
+```
+
+## Parallel Execution with `Promise.all`
+
+Awaiting inside a loop runs requests **sequentially**. Use `Promise.all` to run them in parallel:
+
+```ts
+// ❌ Sequential — each request waits for the previous
+for (const id of ids) {
+  const user = await fetchUser(id);
+}
+
+// ✅ Parallel — all requests fire at once
+const users = await Promise.all(ids.map(id => fetchUser(id)));
+```
+
+## `Promise.allSettled` for Partial Failures
+
+When you want all results regardless of individual failures:
+
+```ts
+const results = await Promise.allSettled(ids.map(id => fetchUser(id)));
+
+for (const result of results) {
+  if (result.status === 'fulfilled') {
+    console.log(result.value);
+  } else {
+    console.error(result.reason);
+  }
+}
+```
+
+## Async Iteration
+
+Node.js supports `for await...of` for async iterables (e.g., readable streams):
+
+```ts
+async function processLines(stream: AsyncIterable<string>) {
+  for await (const line of stream) {
+    process(line);
+  }
+}
+```
+
+## Top-Level Await
+
+In ES modules (`.mjs` or `"type": "module"` in `package.json`), you can use `await` at the top level:
+
+```ts
+// server.ts (ESM)
+const config = await loadConfig();
+const app = createApp(config);
+app.listen(3000);
+```
+
+## Key Takeaways
+
+- `async` functions return Promises; `await` unwraps them.
+- Always handle errors with `try/catch` or `.catch()`.
+- Use `Promise.all` for parallel I/O — never `await` in a loop unless order matters.
+- `Promise.allSettled` is safer when partial failures are acceptable.

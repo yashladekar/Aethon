@@ -1,0 +1,89 @@
+---
+title: React Rendering Model
+description: Learn how React decides when and how to re-render components, including the virtual DOM, reconciliation, and the rules that govern render triggers.
+difficulty: beginner
+estimatedTime: 20
+prerequisites:
+  - frontend/javascript/closures
+relatedTopics:
+  - frontend/react/hook/use-effect
+tags:
+  - react
+  - rendering
+  - virtual-dom
+  - reconciliation
+roadmapIds: []
+usageContexts: []
+---
+
+# React Rendering Model
+
+Understanding when React renders — and why — is the foundation for writing performant, bug-free components.
+
+## What Is a Render?
+
+A **render** is React calling your component function to produce a description of the UI (a React element tree). React then compares this description to the previous one (reconciliation) and applies only the necessary DOM updates.
+
+> Rendering ≠ DOM update. React may render a component without changing the DOM if the output is identical.
+
+## What Triggers a Re-render?
+
+A component re-renders when:
+
+1. **State changes** — `setState` or a `useState` setter is called
+2. **Props change** — the parent passes new prop values
+3. **Context changes** — a consumed context value updates
+4. **Parent re-renders** — by default, all children re-render when a parent does
+
+```tsx
+function Parent() {
+  const [count, setCount] = React.useState(0);
+
+  return (
+    <>
+      <button onClick={() => setCount(c => c + 1)}>Increment</button>
+      <Child /> {/* re-renders every time Parent re-renders */}
+    </>
+  );
+}
+```
+
+## The Virtual DOM and Reconciliation
+
+React maintains a **virtual DOM** — a lightweight in-memory representation of the UI. On each render:
+
+1. React calls the component function → new virtual DOM tree
+2. React **diffs** the new tree against the previous one (reconciliation)
+3. React computes the minimal set of DOM mutations needed
+4. React applies those mutations to the real DOM
+
+This diffing is O(n) thanks to heuristics: React assumes elements of different types produce different trees, and uses `key` props to match list items across renders.
+
+## Keys in Lists
+
+```tsx
+// ❌ Using index as key causes bugs when list order changes
+{items.map((item, i) => <Item key={i} data={item} />)}
+
+// ✅ Use a stable, unique identifier
+{items.map(item => <Item key={item.id} data={item} />)}
+```
+
+## Avoiding Unnecessary Re-renders
+
+- `React.memo` — memoizes a component, skipping re-render if props are shallowly equal
+- `useMemo` — memoizes an expensive computed value
+- `useCallback` — memoizes a callback function reference
+
+```tsx
+const MemoizedChild = React.memo(function Child({ value }: { value: number }) {
+  return <div>{value}</div>;
+});
+```
+
+## Key Takeaways
+
+- React renders are function calls that produce element descriptions, not direct DOM writes.
+- State, props, context changes, and parent re-renders all trigger re-renders.
+- Reconciliation diffs the virtual DOM to minimize real DOM mutations.
+- Use `key` props correctly in lists to help React track element identity.

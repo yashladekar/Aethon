@@ -7,13 +7,16 @@
     }
   },
   "scripts": {
-    "check-types": "tsc -b"
+    "check-types": "tsc -b",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@aethon/shared": "workspace:*"
   },
   "devDependencies": {
     "@aethon/config": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "^4.1.6"
   }
 }

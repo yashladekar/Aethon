@@ -1,0 +1,91 @@
+---
+title: useState Hook
+description: Master React's useState hook — how to declare local component state, update it correctly, and avoid common pitfalls like stale state and object mutation.
+difficulty: beginner
+estimatedTime: 20
+prerequisites:
+  - frontend/react/rendering
+relatedTopics:
+  - frontend/react/hook/use-effect
+  - frontend/javascript/closures
+tags:
+  - react
+  - hooks
+  - state
+roadmapIds: []
+usageContexts: []
+---
+
+# useState Hook
+
+`useState` is the primary hook for adding local state to a React function component.
+
+## Basic Usage
+
+```tsx
+import { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Clicked {count} times
+    </button>
+  );
+}
+```
+
+`useState` returns a tuple: the current state value and a setter function. Calling the setter schedules a re-render with the new value.
+
+## Functional Updates
+
+When the new state depends on the previous state, use the functional updater form to avoid stale closure bugs:
+
+```tsx
+// ❌ May use a stale `count` if multiple updates are batched
+setCount(count + 1);
+
+// ✅ Always receives the latest state
+setCount(prevCount => prevCount + 1);
+```
+
+## Lazy Initialization
+
+If the initial state is expensive to compute, pass a function to `useState` — it runs only on the first render:
+
+```tsx
+const [data, setData] = useState(() => expensiveComputation());
+```
+
+## State with Objects
+
+React state updates are **replacements**, not merges. When storing objects, spread the previous state to preserve other fields:
+
+```tsx
+const [user, setUser] = useState({ name: 'Alice', age: 30 });
+
+// ❌ Replaces the entire object — `age` is lost
+setUser({ name: 'Bob' });
+
+// ✅ Spread to preserve existing fields
+setUser(prev => ({ ...prev, name: 'Bob' }));
+```
+
+## Never Mutate State Directly
+
+```tsx
+// ❌ Mutating state directly — React won't detect the change
+user.name = 'Bob';
+setUser(user);
+
+// ✅ Create a new object
+setUser({ ...user, name: 'Bob' });
+```
+
+## Key Takeaways
+
+- `useState` returns `[value, setter]`; calling the setter triggers a re-render.
+- Use the functional updater `setState(prev => ...)` when new state depends on old state.
+- Pass a function to `useState` for lazy initialization of expensive initial values.
+- Always create new objects/arrays rather than mutating existing state.

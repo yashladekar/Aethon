@@ -1,41 +1,50 @@
-import { notFound } from "next/navigation";
+import { notFound } from 'next/navigation';
+import { source } from '@/lib/source';
+import defaultMdxComponents from 'fumadocs-ui/mdx';
+import { DocsPage, DocsBody, DocsTitle, DocsDescription } from 'fumadocs-ui/page';
 
-import { getTopicBySlug } from "@aethon/content-core";
-
-import { MDXRenderer } from "@/components/mdx-renderer";
-
-export default async function DocsPage({
+export default async function Page({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<{ slug?: string[] }>;
 }) {
   const { slug } = await params;
 
-  const topic = await getTopicBySlug(slug);
+  const page = source.getPage(slug);
 
-  if (!topic) {
+  if (!page) {
     notFound();
   }
 
+  const MDX = page.data.body;
+
   return (
-    <div className="max-w-4xl mx-auto py-10 px-6">
-      <div className="mb-10">
-        <p className="text-sm text-muted-foreground mb-2">
-          {topic.frontmatter.difficulty}
-        </p>
-
-        <h1 className="text-5xl font-bold mb-4">
-          {topic.frontmatter.title}
-        </h1>
-
-        <p className="text-lg text-muted-foreground">
-          {topic.frontmatter.description}
-        </p>
-      </div>
-
-      <article className="prose prose-neutral dark:prose-invert max-w-none">
-        <MDXRenderer source={topic.content} />
-      </article>
-    </div>
+    <DocsPage toc={page.data.toc}>
+      <DocsTitle>{page.data.title}</DocsTitle>
+      <DocsDescription>{page.data.description}</DocsDescription>
+      <DocsBody>
+        <MDX components={{ ...defaultMdxComponents }} />
+      </DocsBody>
+    </DocsPage>
   );
+}
+
+export async function generateStaticParams() {
+  return source.generateParams();
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const { slug } = await params;
+  const page = source.getPage(slug);
+
+  if (!page) notFound();
+
+  return {
+    title: page.data.title,
+    description: page.data.description,
+  };
 }

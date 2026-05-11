@@ -1,0 +1,115 @@
+---
+title: The Node.js Event Loop
+description: Understand how Node.js handles concurrency through its single-threaded event loop, the call stack, the task queue, and the microtask queue.
+difficulty: advanced
+estimatedTime: 35
+prerequisites: []
+relatedTopics:
+  - backend/node/async-await
+tags:
+  - nodejs
+  - event-loop
+  - concurrency
+  - performance
+roadmapIds: []
+usageContexts: []
+---
+
+# The Node.js Event Loop
+
+Node.js achieves high concurrency on a single thread through the **event loop** — a mechanism that continuously checks for pending work and dispatches callbacks.
+
+## The Single-Threaded Model
+
+JavaScript (and Node.js) runs on a single thread. There is one call stack. Long-running synchronous operations block everything else. The event loop's job is to keep that thread busy with useful work rather than waiting.
+
+## Event Loop Phases
+
+The libuv event loop has six phases, executed in order on each iteration ("tick"):
+
+```
+   ┌───────────────────────────┐
+┌─>│           timers          │  setTimeout, setInterval callbacks
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │     pending callbacks     │  I/O callbacks deferred from previous tick
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │       idle, prepare       │  internal use
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │           poll            │  retrieve new I/O events; execute I/O callbacks
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+│  │           check           │  setImmediate callbacks
+│  └─────────────┬─────────────┘
+│  ┌─────────────┴─────────────┐
+└──┤      close callbacks      │  socket.on('close', ...) etc.
+   └───────────────────────────┘
+```
+
+## Microtasks vs Macrotasks
+
+**Microtasks** (Promise callbacks, `queueMicrotask`) run **between** event loop phases — they drain completely before the next phase begins.
+
+**Macrotasks** (setTimeout, setImmediate, I/O callbacks) are scheduled in specific phases.
+
+```ts
+console.log('1 - sync');
+
+setTimeout(() => console.log('4 - setTimeout'), 0);
+
+Promise.resolve().then(() => console.log('3 - microtask'));
+
+console.log('2 - sync');
+
+// Output: 1, 2, 3, 4
+```
+
+## `setImmediate` vs `setTimeout(fn, 0)`
+
+- `setImmediate` fires in the **check** phase, after I/O callbacks
+- `setTimeout(fn, 0)` fires in the **timers** phase
+
+Inside an I/O callback, `setImmediate` always fires before `setTimeout(fn, 0)`:
+
+```ts
+const fs = require('fs');
+fs.readFile(__filename, () => {
+  setTimeout(() => console.log('timeout'), 0);
+  setImmediate(() => console.log('immediate'));
+});
+// Always: immediate, timeout
+```
+
+## `process.nextTick`
+
+`process.nextTick` callbacks run before any other I/O or timers — even before Promise microtasks. Use sparingly; overuse can starve I/O.
+
+```ts
+process.nextTick(() => console.log('nextTick'));
+Promise.resolve().then(() => console.log('promise'));
+// Output: nextTick, promise
+```
+
+## Blocking the Event Loop
+
+CPU-intensive synchronous work blocks the event loop and degrades all concurrent requests:
+
+```ts
+// ❌ Blocks for ~1 second — all other requests stall
+function fibonacci(n: number): number {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+fibonacci(40);
+```
+
+Solutions: Worker Threads, child processes, or offloading to a job queue.
+
+## Key Takeaways
+
+- Node.js is single-threaded; the event loop enables non-blocking I/O.
+- Microtasks (Promises) drain between phases; macrotasks run in specific phases.
+- `process.nextTick` runs before Promise microtasks — use it carefully.
+- Never block the event loop with synchronous CPU work in production servers.

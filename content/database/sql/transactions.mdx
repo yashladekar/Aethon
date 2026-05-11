@@ -1,0 +1,130 @@
+---
+title: Database Transactions
+description: Learn how database transactions guarantee data integrity through ACID properties, and how to use them correctly in PostgreSQL to prevent partial updates and race conditions.
+difficulty: intermediate
+estimatedTime: 35
+prerequisites:
+  - database/sql/queries
+relatedTopics:
+  - database/sql/indexes
+tags:
+  - sql
+  - database
+  - transactions
+  - acid
+  - postgresql
+roadmapIds: []
+usageContexts: []
+---
+
+# Database Transactions
+
+A **transaction** is a sequence of database operations that are treated as a single unit of work. Either all operations succeed (commit) or none of them take effect (rollback).
+
+## ACID Properties
+
+Transactions guarantee four properties:
+
+| Property | Meaning |
+|---|---|
+| **Atomicity** | All operations succeed or none do — no partial updates |
+| **Consistency** | The database moves from one valid state to another |
+| **Isolation** | Concurrent transactions don't interfere with each other |
+| **Durability** | Committed data survives crashes |
+
+## Basic Transaction Syntax
+
+```sql
+BEGIN;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+
+COMMIT;
+```
+
+If anything goes wrong between `BEGIN` and `COMMIT`, use `ROLLBACK`:
+
+```sql
+BEGIN;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+
+-- Something went wrong
+ROLLBACK; -- Neither update takes effect
+```
+
+## Savepoints
+
+Savepoints let you roll back to a specific point within a transaction without aborting the whole thing:
+
+```sql
+BEGIN;
+
+INSERT INTO orders (user_id, total) VALUES (42, 150);
+SAVEPOINT after_order;
+
+INSERT INTO order_items (order_id, product_id) VALUES (LASTVAL(), 99);
+
+-- This item insert failed — roll back just this part
+ROLLBACK TO SAVEPOINT after_order;
+
+-- The order itself is still pending
+COMMIT; -- Only the order is committed
+```
+
+## Isolation Levels
+
+PostgreSQL supports four isolation levels that control what concurrent transactions can see:
+
+| Level | Dirty Read | Non-Repeatable Read | Phantom Read |
+|---|---|---|---|
+| Read Uncommitted | Possible | Possible | Possible |
+| **Read Committed** (default) | Not possible | Possible | Possible |
+| Repeatable Read | Not possible | Not possible | Possible |
+| Serializable | Not possible | Not possible | Not possible |
+
+```sql
+-- Use Serializable for financial operations
+BEGIN ISOLATION LEVEL SERIALIZABLE;
+-- ...
+COMMIT;
+```
+
+## Transactions in Application Code
+
+In Node.js with Prisma:
+
+```ts
+const result = await prisma.$transaction(async (tx) => {
+  const sender = await tx.account.update({
+    where: { id: senderId },
+    data: { balance: { decrement: amount } },
+  });
+
+  if (sender.balance < 0) {
+    throw new Error('Insufficient funds');
+  }
+
+  const receiver = await tx.account.update({
+    where: { id: receiverId },
+    data: { balance: { increment: amount } },
+  });
+
+  return { sender, receiver };
+});
+// If the callback throws, Prisma automatically rolls back
+```
+
+## Common Pitfalls
+
+- **Long transactions** — hold locks for too long, blocking other queries
+- **Missing error handling** — forgetting to rollback on failure leaves the connection in a broken state
+- **N+1 inside transactions** — running many small queries inside a transaction amplifies lock contention
+
+## Key Takeaways
+
+- Transactions ensure atomicity: all-or-nothing execution.
+- Use `BEGIN` / `COMMIT` / `ROLLBACK` in raw SQL; ORMs like Prisma handle this via `$transaction`.
+- Choose the right isolation level — `Read Committed` is the default; use `Serializable` for critical financial operations.
+- Keep transactions short to minimize lock contention.

@@ -1,34 +1,118 @@
 ---
-title: useEffect
-description: Learn useEffect deeply
+title: useEffect Hook
+description: Master React's useEffect hook — how to synchronize components with external systems, manage side effects, and write correct dependency arrays to avoid stale closures and infinite loops.
 difficulty: intermediate
 estimatedTime: 30
+prerequisites:
+  - frontend/javascript/closures
+  - frontend/react/rendering
+relatedTopics:
+  - frontend/react/hook/use-state
 tags:
   - react
   - hooks
-prerequisites:
-  - closures
-  - rendering
+  - side-effects
+  - lifecycle
+roadmapIds: []
+usageContexts: []
 ---
 
-# useEffect
+# useEffect Hook
 
-React's synchronization hook.
+`useEffect` is React's mechanism for synchronizing a component with an external system — a network request, a DOM API, a timer, or a third-party library.
 
-## Basic Example
+## Basic Usage
 
 ```tsx
+import { useEffect } from 'react';
+
+function Logger({ value }: { value: number }) {
+  useEffect(() => {
+    console.log('Value changed:', value);
+  }, [value]); // runs after every render where `value` changed
+
+  return <div>{value}</div>;
+}
+```
+
+## The Dependency Array
+
+The second argument controls when the effect runs:
+
+| Dependency array | When the effect runs |
+|---|---|
+| Omitted | After every render |
+| `[]` (empty) | Once, after the first render (mount) |
+| `[a, b]` | After renders where `a` or `b` changed |
+
+```tsx
+// Run once on mount
 useEffect(() => {
-  console.log("Mounted");
+  console.log('Mounted');
 }, []);
+
+// Run on every render (rarely what you want)
+useEffect(() => {
+  console.log('Rendered');
+});
 ```
 
 ## Cleanup
 
+Return a function from the effect to clean up when the component unmounts or before the effect re-runs:
+
 ```tsx
 useEffect(() => {
-  return () => {
-    console.log("Cleanup");
-  };
+  const id = setInterval(() => {
+    setCount(c => c + 1);
+  }, 1000);
+
+  return () => clearInterval(id); // cleanup
 }, []);
 ```
+
+## Fetching Data
+
+```tsx
+useEffect(() => {
+  let cancelled = false;
+
+  async function load() {
+    const data = await fetchUser(userId);
+    if (!cancelled) setUser(data);
+  }
+
+  load();
+
+  return () => { cancelled = true; }; // prevent state update after unmount
+}, [userId]);
+```
+
+## Stale Closure Pitfall
+
+Because effects close over values at render time, omitting a dependency can cause stale reads:
+
+```tsx
+// ❌ `count` is always 0 inside the callback — stale closure
+useEffect(() => {
+  const id = setInterval(() => {
+    setCount(count + 1); // count is captured at 0
+  }, 1000);
+  return () => clearInterval(id);
+}, []);
+
+// ✅ Use functional updater — no dependency on `count`
+useEffect(() => {
+  const id = setInterval(() => {
+    setCount(c => c + 1);
+  }, 1000);
+  return () => clearInterval(id);
+}, []);
+```
+
+## Key Takeaways
+
+- `useEffect` synchronizes components with external systems; it is not a lifecycle method.
+- Always specify the dependency array; omitting it runs the effect after every render.
+- Return a cleanup function to cancel subscriptions, timers, and async operations.
+- Use the functional updater form of `setState` inside effects to avoid stale closures.

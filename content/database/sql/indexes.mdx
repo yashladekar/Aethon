@@ -1,0 +1,106 @@
+---
+title: Database Indexes
+description: Learn how database indexes work, when to add them, and how to avoid common pitfalls like over-indexing and index bloat that can hurt write performance.
+difficulty: intermediate
+estimatedTime: 30
+prerequisites:
+  - database/sql/queries
+relatedTopics:
+  - database/sql/query-planning
+  - database/sql/transactions
+tags:
+  - sql
+  - database
+  - performance
+  - indexes
+  - postgresql
+roadmapIds: []
+usageContexts: []
+---
+
+# Database Indexes
+
+An **index** is a data structure that allows the database to find rows matching a condition without scanning the entire table. Indexes are the single most impactful performance tool available to application developers.
+
+## How a B-Tree Index Works
+
+Most relational databases (PostgreSQL, MySQL, SQLite) default to **B-tree** indexes. A B-tree is a balanced tree where:
+
+- Leaf nodes store the indexed column values alongside pointers to the actual table rows (heap tuples)
+- The tree stays balanced, so lookups, inserts, and deletes are all O(log n)
+- Range queries (`BETWEEN`, `>`, `<`) are efficient because leaf nodes are linked in sorted order
+
+```
+Without index: full table scan — O(n)
+With B-tree index: O(log n) lookup + O(1) row fetch
+```
+
+## Creating an Index
+
+```sql
+-- Single-column index
+CREATE INDEX idx_users_email ON users (email);
+
+-- Composite index (column order matters!)
+CREATE INDEX idx_orders_user_created ON orders (user_id, created_at DESC);
+
+-- Unique index (also enforces uniqueness constraint)
+CREATE UNIQUE INDEX idx_users_email_unique ON users (email);
+```
+
+## When to Add an Index
+
+Add an index when:
+
+- A column appears frequently in `WHERE`, `JOIN ON`, or `ORDER BY` clauses
+- The column has high cardinality (many distinct values — e.g., email, UUID)
+- Query plans show sequential scans on large tables (`EXPLAIN ANALYZE`)
+
+```sql
+-- Check if a query uses an index
+EXPLAIN ANALYZE
+SELECT * FROM orders WHERE user_id = 42 AND created_at > NOW() - INTERVAL '30 days';
+```
+
+## Composite Index Column Order
+
+For a composite index `(a, b, c)`, the database can use it for queries filtering on:
+- `a`
+- `a, b`
+- `a, b, c`
+
+But **not** for queries filtering only on `b` or `c` (the leftmost prefix rule).
+
+```sql
+-- ✅ Uses index (a, b, c)
+SELECT * FROM t WHERE a = 1 AND b = 2;
+
+-- ❌ Cannot use index — skips `a`
+SELECT * FROM t WHERE b = 2;
+```
+
+## Index Costs
+
+Indexes are not free:
+
+- **Write overhead** — every `INSERT`, `UPDATE`, and `DELETE` must update all relevant indexes
+- **Storage** — indexes consume disk space (sometimes as much as the table itself)
+- **Planner confusion** — too many indexes can cause the query planner to make suboptimal choices
+
+Rule of thumb: index for your read patterns, but audit unused indexes regularly.
+
+## Partial Indexes
+
+Index only a subset of rows to reduce size and write overhead:
+
+```sql
+-- Only index active users — much smaller than a full index
+CREATE INDEX idx_users_active_email ON users (email) WHERE status = 'active';
+```
+
+## Key Takeaways
+
+- B-tree indexes enable O(log n) lookups instead of O(n) full table scans.
+- Composite index column order follows the leftmost prefix rule.
+- Every index adds write overhead — don't over-index.
+- Use `EXPLAIN ANALYZE` to verify that your indexes are actually being used.
