@@ -1,4 +1,4 @@
-import { progressStatuses } from '../constants/learning.js';
+import { progressStatuses } from '../constants/learning.ts';
 
 export type ProgressStatus = (typeof progressStatuses)[number];
 

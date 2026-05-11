@@ -1,4 +1,4 @@
-import { topicDifficulties, topicKinds, topicStatuses } from '../constants/topic.js';
+import { topicDifficulties, topicKinds, topicStatuses } from '../constants/topic.ts';
 
 export type TopicDifficulty = (typeof topicDifficulties)[number];
 export type TopicKind = (typeof topicKinds)[number];

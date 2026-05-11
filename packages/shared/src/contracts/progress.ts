@@ -1,4 +1,4 @@
-import { revisionStatuses } from '../constants/learning.js';
+import { revisionStatuses } from '../constants/learning.ts';
 
 export type RevisionStatus = (typeof revisionStatuses)[number];
 

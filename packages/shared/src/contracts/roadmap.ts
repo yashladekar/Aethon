@@ -1,4 +1,4 @@
-import { roadmapStatuses, roadmapNodeKinds } from '../constants/roadmap.js';
+import { roadmapStatuses, roadmapNodeKinds } from '../constants/roadmap.ts';
 import type { TopicDifficulty } from './topic.js';
 
 export type RoadmapStatus = (typeof roadmapStatuses)[number];

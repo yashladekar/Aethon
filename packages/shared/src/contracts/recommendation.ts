@@ -1,4 +1,4 @@
-import { recommendationTypes, recommendationStatuses } from '../constants/recommendation.js';
+import { recommendationTypes, recommendationStatuses } from '../constants/recommendation.ts';
 
 export type RecommendationType = (typeof recommendationTypes)[number];
 export type RecommendationStatus = (typeof recommendationStatuses)[number];
