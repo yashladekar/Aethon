@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@aethon/api": "workspace:*",
+    "@aethon/content-core": "workspace:*",
     "@aethon/env": "workspace:*",
+    "@aethon/roadmap-engine": "workspace:*",
     "@aethon/ui": "workspace:*",
     "@ai-sdk/react": "^3.0.3",
     "@codesandbox/sandpack-react": "^2.20.0",

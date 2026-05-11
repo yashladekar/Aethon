@@ -261,9 +261,15 @@ importers:
       '@aethon/api':
         specifier: workspace:*
         version: link:../../packages/api
+      '@aethon/content-core':
+        specifier: workspace:*
+        version: link:../../packages/content-core
       '@aethon/env':
         specifier: workspace:*
         version: link:../../packages/env
+      '@aethon/roadmap-engine':
+        specifier: workspace:*
+        version: link:../../packages/roadmap-engine
       '@aethon/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -407,6 +413,9 @@ importers:
       '@aethon/auth':
         specifier: workspace:*
         version: link:../auth
+      '@aethon/content-core':
+        specifier: workspace:*
+        version: link:../content-core
       '@aethon/db':
         specifier: workspace:*
         version: link:../db
@@ -524,12 +533,18 @@ importers:
       '@aethon/config':
         specifier: workspace:*
         version: link:../config
+      '@aethon/content-core':
+        specifier: workspace:*
+        version: link:../content-core
       '@types/pg':
         specifier: ^8.16.0
         version: 8.20.0
       prisma:
         specifier: ^7.7.0
         version: 7.8.0(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@6.0.3)
+      tsx:
+        specifier: ^4.19.2
+        version: 4.21.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -621,9 +636,6 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.2.6(react@19.2.6)
-      tsx:
-        specifier: ^4.19.0
-        version: 4.21.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

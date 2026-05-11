@@ -1,4 +1,6 @@
 import prisma from "@aethon/db";
+import { contentRegistry } from "@aethon/content-core";
+import { z } from "zod";
 
 import { publicProcedure, router } from "../index";
 
@@ -145,4 +147,28 @@ export const platformRouter = router({
       };
     }
   }),
+
+  topicBySlug: publicProcedure
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ input }) => {
+      try {
+        await contentRegistry.initialize();
+        const topic = contentRegistry.getTopicBySlug(input.slug);
+        if (!topic) return null;
+        return {
+          slug: topic.slug,
+          section: topic.section,
+          title: topic.metadata.title,
+          description: topic.metadata.description,
+          difficulty: topic.metadata.difficulty,
+          estimatedTime: topic.metadata.estimatedTime,
+          tags: topic.metadata.tags,
+          prerequisites: topic.metadata.prerequisites,
+          relatedTopics: topic.metadata.relatedTopics,
+          body: topic.body,
+        };
+      } catch {
+        return null;
+      }
+    }),
 });

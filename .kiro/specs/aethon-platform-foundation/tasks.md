@@ -103,28 +103,28 @@
 
 ## Phase 5 — Learning Workspace
 
-- [~] 11. Create workspace route structure in `apps/web`
+- [x] 11. Create workspace route structure in `apps/web`
   - Create `apps/web/app/learn/[roadmapId]/page.tsx` — renders `RoadmapRenderer` with roadmap data fetched via tRPC `platform.roadmaps`
   - Create `apps/web/app/learn/[roadmapId]/[topicSlug]/layout.tsx` — workspace shell with `ResizablePanelGroup` from `@aethon/ui`
   - Create `apps/web/app/learn/[roadmapId]/[topicSlug]/page.tsx` — fetches topic via tRPC `topics.topicBySlug` and renders the workspace
   - _Requirements: 8_
 
-- [~] 12. Build Monaco Editor dynamic component
+- [x] 12. Build Monaco Editor dynamic component
   - Create `apps/web/components/workspace/monaco-editor-inner.tsx` — client component using `@monaco-editor/react`, accepting `initialValue` and `onChange` props, disposing model on unmount
   - Create `apps/web/components/workspace/editor-panel.tsx` — wraps `monaco-editor-inner` with `next/dynamic` (`ssr: false`), `Suspense` with skeleton fallback, and `ErrorBoundary`
   - _Requirements: 9, 19_
 
-- [~] 13. Build Sandpack dynamic component
+- [x] 13. Build Sandpack dynamic component
   - Create `apps/web/components/workspace/sandpack-inner.tsx` — client component using `@codesandbox/sandpack-react` with `SandpackProvider`, `SandpackCodeEditor`, and `SandpackPreview`
   - Create `apps/web/components/workspace/sandbox-panel.tsx` — wraps with `next/dynamic` (`ssr: false`), `Suspense`, and `ErrorBoundary`
   - _Requirements: 10, 19_
 
-- [~] 14. Build XTerm dynamic component
+- [x] 14. Build XTerm dynamic component
   - Create `apps/web/components/workspace/xterm-inner.tsx` — client component using `xterm` + `xterm-addon-fit`, attaching to a div ref, calling `fit()` on mount and on `ResizeObserver`, disposing on unmount
   - Create `apps/web/components/workspace/terminal-panel.tsx` — wraps with `next/dynamic` (`ssr: false`), `Suspense`, and `ErrorBoundary`
   - _Requirements: 11, 19_
 
-- [~] 15. Assemble the Learning Workspace layout
+- [x] 15. Assemble the Learning Workspace layout
   - Create `apps/web/components/workspace/workspace-layout.tsx` — `ResizablePanelGroup` with left content panel (MDX rendered) and right interactive panel
   - Create `apps/web/components/workspace/workspace-panel.tsx` — tab switcher (`editor` | `sandbox` | `terminal`) that conditionally renders the three dynamic panels; defaults to content-only when topic `kind` is `concept` or `lesson` with no explicit mode
   - Create `apps/web/components/workspace/panel-error.tsx` — error fallback UI for failed dynamic imports
@@ -141,7 +141,7 @@
   - Run `pnpm db:generate` to regenerate the Prisma client
   - _Requirements: 12_
 
-- [~] 17. Build content sync script
+- [x] 17. Build content sync script
   - Create `packages/db/src/sync/sync-content.ts` that initializes `contentRegistry`, iterates all topics, and upserts `Topic` records using `slug` as the unique key
   - Upsert `TopicRelation` records from `contentRegistry.getTopicGraph()` using `(sourceTopicId, targetTopicId, type)` as the unique key
   - Add `db:sync` script to `packages/db/package.json` and root `package.json`
@@ -151,14 +151,14 @@
 
 ## Phase 7 — tRPC API Expansion
 
-- [~] 18. Add `topics` tRPC router
+- [ ] 18. Add `topics` tRPC router
   - Create `packages/api/src/routers/topics.ts` with:
     - `topicBySlug`: public procedure accepting `{ slug: string }`, returning `TopicDocument | null` from `contentRegistry`
     - `topicsForSearch`: public procedure returning `contentRegistry.getTopicsForSearch()`
   - Register `topics` router in `packages/api/src/routers/index.ts`
   - _Requirements: 20_
 
-- [~] 19. Add `learning` tRPC router
+- [ ] 19. Add `learning` tRPC router
   - Create `packages/api/src/routers/learning.ts` with:
     - `learnerProgress`: protected procedure accepting `{ roadmapId: string }`, returning `Progress[]` for the authenticated user
     - `revisionQueue`: protected procedure returning pending `RevisionQueue` entries ordered by `dueAt`
@@ -170,7 +170,7 @@
 
 ## Phase 8 — Adaptive Engine
 
-- [~] 20. Implement weakness detection in `packages/adaptive-engine`
+- [ ] 20. Implement weakness detection in `packages/adaptive-engine`
   - Create `packages/adaptive-engine/src/weakness-detector.ts` with `getWeaknessSignals(userId: string): Promise<WeaknessSignal[]>` querying `MistakeLog` ordered by `repeatedCount` descending
   - Create `packages/adaptive-engine/src/mistake-tracker.ts` with:
     - `recordQuizAttempt(data: QuizAttemptInput): Promise<void>` — creates `QuizAttempt` record
@@ -178,7 +178,7 @@
   - Export both from `packages/adaptive-engine/src/index.ts`
   - _Requirements: 14_
 
-- [~] 21. Implement recommendation traversal in `packages/adaptive-engine`
+- [ ] 21. Implement recommendation traversal in `packages/adaptive-engine`
   - Create `packages/adaptive-engine/src/recommendation-engine.ts` with `generateRecommendations(userId: string, graph: KnowledgeGraph): Promise<void>`
   - Use `GraphEngine.getRecommendationPath()` to find prerequisite chains for each weakness signal
   - Skip topics where `Progress.status === 'mastered'`
@@ -191,20 +191,20 @@
 
 ## Phase 9 — AI Engine
 
-- [~] 22. Implement quiz generation in `packages/ai-engine`
+- [ ] 22. Implement quiz generation in `packages/ai-engine`
   - Create `packages/ai-engine/src/tools/generate-quiz.ts` using Vercel AI SDK `generateObject` with a Zod schema for `QuizQuestion[]`
   - Define `QuizQuestion` interface: `{ id, prompt, options: string[], correctIndex: number, explanation: string, conceptKey: string, hint?: string }`
   - Implement retry logic: retry once on malformed response, throw descriptive error on second failure
   - _Requirements: 16_
 
-- [~] 23. Implement tutoring and summaries in `packages/ai-engine`
+- [ ] 23. Implement tutoring and summaries in `packages/ai-engine`
   - Create `packages/ai-engine/src/tools/generate-summary.ts` using `generateText` with a 150-word max prompt constraint
   - Create `packages/ai-engine/src/tools/tutor-response.ts` using `streamText`, accepting `MentorContext` to ground the system prompt in the learner's current topic and roadmap
   - Create `packages/ai-engine/src/ai-engine.ts` composing all tools into a single `aiEngine` export
   - Export `aiEngine` from `packages/ai-engine/src/index.ts`
   - _Requirements: 17_
 
-- [~] 24. Add AI tRPC procedures
+- [ ] 24. Add AI tRPC procedures
   - Create `packages/api/src/routers/ai.ts` with:
     - `generateQuiz`: protected procedure accepting `{ topicSlug: string, questionCount: number, includeHints?: boolean }`, calling `aiEngine.generateQuiz`
     - `generateSummary`: protected procedure accepting `{ topicSlug: string }`, calling `aiEngine.generateSummary`
@@ -215,7 +215,7 @@
 
 ## Phase 10 — Search Engine
 
-- [~] 25. Implement `packages/search-engine`
+- [ ] 25. Implement `packages/search-engine`
   - Create `packages/search-engine/src/search-engine.ts` using `@orama/orama` `create`, `insert`, and `search`
   - Define schema with `slug: 'string'`, `title: 'string'`, `description: 'string'`, `tags: 'string[]'`
   - Implement `buildSearchIndex(topics: SearchDocument[]): Promise<void>`
