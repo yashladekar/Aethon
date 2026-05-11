@@ -1,3 +1,15 @@
 {
-  "extends": "@aethon/config/tsconfig.package.json"
+  "extends": "@aethon/config/tsconfig.package.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "lib": [
+      "ESNext",
+      "DOM",
+      "DOM.Iterable"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
 }

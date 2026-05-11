@@ -70,7 +70,7 @@
 
 ## Phase 4 — Roadmap Engine
 
-- [~] 7. Create Roadmap Document Zod schema
+- [x] 7. Create Roadmap Document Zod schema
   - Create `packages/roadmap-engine/src/schema/roadmap-document.schema.ts`
   - Define `roadmapNodeSchema` with fields: `id`, `topicId` (optional), `label`, `kind` (RoadmapNodeKind), `difficulty` (optional), `estimatedMinutes` (optional), `positionX` (optional), `positionY` (optional)
   - Define `roadmapEdgeSchema` with fields: `id`, `source`, `target`, `label` (optional)
@@ -78,13 +78,13 @@
   - Export `RoadmapDocument`, `RoadmapNodeDefinition`, `RoadmapEdgeDefinition` types inferred from schemas
   - _Requirements: 7_
 
-- [~] 8. Implement ELK layout computation
+- [x] 8. Implement ELK layout computation
   - Create `packages/roadmap-engine/src/layout/elk-layout.ts`
   - Implement `computeElkLayout(document: RoadmapDocument): Promise<RoadmapDocument>` that runs ELK's `layered` algorithm and returns the document with `positionX`/`positionY` filled in for all nodes
   - Only run ELK when at least one node is missing position data
   - _Requirements: 6_
 
-- [~] 9. Build Roadmap Engine React components
+- [x] 9. Build Roadmap Engine React components
   - Create `packages/roadmap-engine/src/components/RoadmapNode.tsx` — custom React Flow node with label, kind badge, difficulty indicator, and progress status color
   - Create `packages/roadmap-engine/src/components/RoadmapEdge.tsx` — custom directed edge
   - Create `packages/roadmap-engine/src/components/RoadmapEmptyState.tsx` — empty state message
@@ -93,7 +93,7 @@
   - Export `RoadmapRenderer` and `RoadmapDocument` from `packages/roadmap-engine/src/index.ts`
   - _Requirements: 6, 7_
 
-- [~] 10. Create sample roadmap JSON data files
+- [x] 10. Create sample roadmap JSON data files
   - Create `content/roadmaps/frontend.json` with a frontend learning roadmap using the `RoadmapDocument` schema
   - Include at least 8 nodes with proper `topicId` references and prerequisite edges
   - Validate the file against `roadmapDocumentSchema` in a build-time check

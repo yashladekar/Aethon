@@ -1,25 +1,16 @@
-import type { RoadmapNodeKind, TopicDifficulty } from "@aethon/shared";
+export {
+  roadmapNodeSchema,
+  roadmapEdgeSchema,
+  roadmapDocumentSchema,
+  type RoadmapNodeDefinition,
+  type RoadmapEdgeDefinition,
+  type RoadmapDocument,
+} from './schema/roadmap-document.schema.js';
 
-export interface RoadmapNodeDefinition {
-  id: string;
-  topicId?: string;
-  label: string;
-  kind: RoadmapNodeKind;
-  difficulty?: TopicDifficulty;
-  estimatedMinutes?: number;
-}
+export { computeElkLayout } from './layout/elk-layout.js';
 
-export interface RoadmapEdgeDefinition {
-  id: string;
-  source: string;
-  target: string;
-  label?: string;
-}
-
-export interface RoadmapDocument {
-  id: string;
-  title: string;
-  description?: string;
-  nodes: RoadmapNodeDefinition[];
-  edges: RoadmapEdgeDefinition[];
-}
+export { RoadmapRenderer, type RoadmapRendererProps } from './components/RoadmapRenderer.js';
+export { RoadmapNode, type RoadmapNodeData } from './components/RoadmapNode.js';
+export { RoadmapEdge } from './components/RoadmapEdge.js';
+export { RoadmapEmptyState } from './components/RoadmapEmptyState.js';
+export { useRoadmapStore } from './store/roadmap-store.js';

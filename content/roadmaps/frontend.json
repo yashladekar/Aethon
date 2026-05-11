@@ -1,0 +1,152 @@
+{
+    "id": "frontend",
+    "title": "Frontend Development Roadmap",
+    "description": "A structured learning path covering JavaScript fundamentals, React core concepts, and advanced frontend patterns.",
+    "nodes": [
+        {
+            "id": "node-closures",
+            "topicId": "frontend/javascript/closures",
+            "label": "JavaScript Closures",
+            "kind": "topic",
+            "difficulty": "intermediate",
+            "estimatedMinutes": 25
+        },
+        {
+            "id": "node-rendering",
+            "topicId": "frontend/react/rendering",
+            "label": "React Rendering Model",
+            "kind": "topic",
+            "difficulty": "beginner",
+            "estimatedMinutes": 20
+        },
+        {
+            "id": "node-use-state",
+            "topicId": "frontend/react/hook/use-state",
+            "label": "useState Hook",
+            "kind": "topic",
+            "difficulty": "beginner",
+            "estimatedMinutes": 20
+        },
+        {
+            "id": "node-use-effect",
+            "topicId": "frontend/react/hook/use-effect",
+            "label": "useEffect Hook",
+            "kind": "topic",
+            "difficulty": "intermediate",
+            "estimatedMinutes": 30
+        },
+        {
+            "id": "node-js-fundamentals-milestone",
+            "label": "JavaScript Fundamentals Complete",
+            "kind": "milestone"
+        },
+        {
+            "id": "node-hooks-checkpoint",
+            "label": "React Hooks Checkpoint",
+            "kind": "checkpoint",
+            "difficulty": "intermediate"
+        },
+        {
+            "id": "node-custom-hooks",
+            "topicId": "frontend/react/hook/custom-hooks",
+            "label": "Custom Hooks",
+            "kind": "topic",
+            "difficulty": "advanced",
+            "estimatedMinutes": 35
+        },
+        {
+            "id": "node-state-management",
+            "topicId": "frontend/react/state-management",
+            "label": "State Management Patterns",
+            "kind": "topic",
+            "difficulty": "advanced",
+            "estimatedMinutes": 45
+        },
+        {
+            "id": "node-react-practice",
+            "label": "Build a Todo App",
+            "kind": "practice",
+            "difficulty": "intermediate",
+            "estimatedMinutes": 60
+        },
+        {
+            "id": "node-frontend-capstone",
+            "label": "Frontend Capstone Project",
+            "kind": "capstone",
+            "difficulty": "advanced",
+            "estimatedMinutes": 120
+        }
+    ],
+    "edges": [
+        {
+            "id": "edge-closures-to-milestone",
+            "source": "node-closures",
+            "target": "node-js-fundamentals-milestone",
+            "label": "completes"
+        },
+        {
+            "id": "edge-closures-to-rendering",
+            "source": "node-closures",
+            "target": "node-rendering",
+            "label": "prerequisite"
+        },
+        {
+            "id": "edge-rendering-to-use-state",
+            "source": "node-rendering",
+            "target": "node-use-state",
+            "label": "prerequisite"
+        },
+        {
+            "id": "edge-rendering-to-use-effect",
+            "source": "node-rendering",
+            "target": "node-use-effect",
+            "label": "prerequisite"
+        },
+        {
+            "id": "edge-closures-to-use-effect",
+            "source": "node-closures",
+            "target": "node-use-effect",
+            "label": "prerequisite"
+        },
+        {
+            "id": "edge-use-state-to-checkpoint",
+            "source": "node-use-state",
+            "target": "node-hooks-checkpoint"
+        },
+        {
+            "id": "edge-use-effect-to-checkpoint",
+            "source": "node-use-effect",
+            "target": "node-hooks-checkpoint"
+        },
+        {
+            "id": "edge-checkpoint-to-custom-hooks",
+            "source": "node-hooks-checkpoint",
+            "target": "node-custom-hooks",
+            "label": "unlocks"
+        },
+        {
+            "id": "edge-custom-hooks-to-state-mgmt",
+            "source": "node-custom-hooks",
+            "target": "node-state-management",
+            "label": "prerequisite"
+        },
+        {
+            "id": "edge-checkpoint-to-practice",
+            "source": "node-hooks-checkpoint",
+            "target": "node-react-practice",
+            "label": "unlocks"
+        },
+        {
+            "id": "edge-state-mgmt-to-capstone",
+            "source": "node-state-management",
+            "target": "node-frontend-capstone",
+            "label": "prerequisite"
+        },
+        {
+            "id": "edge-practice-to-capstone",
+            "source": "node-react-practice",
+            "target": "node-frontend-capstone",
+            "label": "prerequisite"
+        }
+    ]
+}
