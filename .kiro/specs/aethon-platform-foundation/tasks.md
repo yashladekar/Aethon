@@ -191,20 +191,20 @@
 
 ## Phase 9 — AI Engine
 
-- [ ] 22. Implement quiz generation in `packages/ai-engine`
+- [x] 22. Implement quiz generation in `packages/ai-engine`
   - Create `packages/ai-engine/src/tools/generate-quiz.ts` using Vercel AI SDK `generateObject` with a Zod schema for `QuizQuestion[]`
   - Define `QuizQuestion` interface: `{ id, prompt, options: string[], correctIndex: number, explanation: string, conceptKey: string, hint?: string }`
   - Implement retry logic: retry once on malformed response, throw descriptive error on second failure
   - _Requirements: 16_
 
-- [ ] 23. Implement tutoring and summaries in `packages/ai-engine`
+- [x] 23. Implement tutoring and summaries in `packages/ai-engine`
   - Create `packages/ai-engine/src/tools/generate-summary.ts` using `generateText` with a 150-word max prompt constraint
   - Create `packages/ai-engine/src/tools/tutor-response.ts` using `streamText`, accepting `MentorContext` to ground the system prompt in the learner's current topic and roadmap
   - Create `packages/ai-engine/src/ai-engine.ts` composing all tools into a single `aiEngine` export
   - Export `aiEngine` from `packages/ai-engine/src/index.ts`
   - _Requirements: 17_
 
-- [ ] 24. Add AI tRPC procedures
+- [x] 24. Add AI tRPC procedures
   - Create `packages/api/src/routers/ai.ts` with:
     - `generateQuiz`: protected procedure accepting `{ topicSlug: string, questionCount: number, includeHints?: boolean }`, calling `aiEngine.generateQuiz`
     - `generateSummary`: protected procedure accepting `{ topicSlug: string }`, calling `aiEngine.generateSummary`
@@ -215,7 +215,7 @@
 
 ## Phase 10 — Search Engine
 
-- [ ] 25. Implement `packages/search-engine`
+- [x] 25. Implement `packages/search-engine`
   - Create `packages/search-engine/src/search-engine.ts` using `@orama/orama` `create`, `insert`, and `search`
   - Define schema with `slug: 'string'`, `title: 'string'`, `description: 'string'`, `tags: 'string[]'`
   - Implement `buildSearchIndex(topics: SearchDocument[]): Promise<void>`

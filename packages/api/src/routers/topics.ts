@@ -1,4 +1,5 @@
 import { contentRegistry } from "@aethon/content-core";
+import { buildSearchIndex, searchTopics, type SearchResult } from "@aethon/search-engine";
 import { z } from "zod";
 
 import { publicProcedure, router } from "../index";
@@ -16,4 +17,13 @@ export const topicsRouter = router({
         await contentRegistry.initialize();
         return contentRegistry.getTopicsForSearch();
     }),
+
+    search: publicProcedure
+        .input(z.object({ query: z.string() }))
+        .query(async ({ input }): Promise<SearchResult[]> => {
+            await contentRegistry.initialize();
+            const topics = contentRegistry.getTopicsForSearch();
+            await buildSearchIndex(topics);
+            return searchTopics(input.query);
+        }),
 });

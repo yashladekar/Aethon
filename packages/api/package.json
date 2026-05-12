@@ -17,6 +17,7 @@
     "@aethon/content-core": "workspace:*",
     "@aethon/db": "workspace:*",
     "@aethon/env": "workspace:*",
+    "@aethon/search-engine": "workspace:*",
     "@prisma/client": "catalog:",
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",

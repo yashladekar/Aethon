@@ -1,7 +1,6 @@
-export interface SearchDocument {
-  id: string;
-  title: string;
-  body: string;
-  tags: string[];
-  source: "topic" | "roadmap" | "note" | "snippet";
-}
+export {
+  buildSearchIndex,
+  searchTopics,
+  type SearchDocument,
+  type SearchResult,
+} from "./search-engine";
