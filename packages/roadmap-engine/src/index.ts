@@ -14,3 +14,6 @@ export { RoadmapNode, type RoadmapNodeData } from './components/RoadmapNode';
 export { RoadmapEdge } from './components/RoadmapEdge';
 export { RoadmapEmptyState } from './components/RoadmapEmptyState';
 export { useRoadmapStore } from './store/roadmap-store';
+
+// ─── Loaders ──────────────────────────────────────────────────────────────────
+export { loadRoadmap, getAvailableRoadmapIds } from './loaders/load-roadmap';

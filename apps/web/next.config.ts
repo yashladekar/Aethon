@@ -4,7 +4,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typedRoutes: true,
   reactCompiler: true,
-  transpilePackages: ["shiki"],
+  transpilePackages: ["shiki", "@aethon/roadmap-engine"],
 };
 
 export default nextConfig;

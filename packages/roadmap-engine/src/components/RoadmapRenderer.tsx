@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ReactFlow,
+    ReactFlowProvider,
     MiniMap,
     Controls,
     type Node,
     type Edge,
     type NodeTypes,
     type EdgeTypes,
-    type OnNodeClick,
+    type NodeMouseHandler,
     MarkerType,
 } from '@xyflow/react';
 import type { ProgressStatus } from '@aethon/shared';
@@ -99,7 +100,7 @@ export function RoadmapRenderer({
         };
     }, [roadmapDoc, progressByTopicId, setLayoutComputed]);
 
-    const handleNodeClick: OnNodeClick = useCallback(
+    const handleNodeClick: NodeMouseHandler = useCallback(
         (_event, node) => {
             const nodeData = node.data as unknown as RoadmapNodeData;
             selectNode(node.id);
@@ -143,25 +144,27 @@ export function RoadmapRenderer({
     }
 
     return (
-        <div className={className} style={{ width: '100%', height: '100%', minHeight: '400px' }}>
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                edgeTypes={edgeTypes}
-                defaultEdgeOptions={defaultEdgeOptions}
-                onNodeClick={handleNodeClick}
-                fitView
-                fitViewOptions={{ padding: 0.2 }}
-                proOptions={{ hideAttribution: true }}
-            >
-                <MiniMap
-                    nodeStrokeWidth={3}
-                    zoomable
-                    pannable
-                />
-                <Controls />
-            </ReactFlow>
-        </div>
+        <ReactFlowProvider>
+            <div className={className} style={{ width: '100%', height: '100%', minHeight: '400px' }}>
+                <ReactFlow
+                    nodes={nodes}
+                    edges={edges}
+                    nodeTypes={nodeTypes}
+                    edgeTypes={edgeTypes}
+                    defaultEdgeOptions={defaultEdgeOptions}
+                    onNodeClick={handleNodeClick}
+                    fitView
+                    fitViewOptions={{ padding: 0.2 }}
+                    proOptions={{ hideAttribution: true }}
+                >
+                    <MiniMap
+                        nodeStrokeWidth={3}
+                        zoomable
+                        pannable
+                    />
+                    <Controls />
+                </ReactFlow>
+            </div>
+        </ReactFlowProvider>
     );
 }

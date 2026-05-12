@@ -13,8 +13,8 @@ export function parseTopic(fileContent: string, filePath?: string): {
 
   if (!result.success) {
     const location = filePath ? `"${filePath}"` : "unknown file";
-    const message = result.error.errors
-      .map((e) => `  - ${e.path.join(".")}: ${e.message}`)
+    const message = result.error.issues
+      .map((e) => `  - ${String(e.path.join("."))}: ${e.message}`)
       .join("\n");
     throw new Error(
       `Topic frontmatter validation failed in ${location}:\n${message}`

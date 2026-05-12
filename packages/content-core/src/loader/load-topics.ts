@@ -1,5 +1,4 @@
 import fg from "fast-glob";
-import fs from "fs/promises";
 import path from "path";
 
 const CONTENT_PATH = path.join(
