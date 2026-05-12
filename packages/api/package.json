@@ -13,6 +13,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@aethon/ai-engine": "workspace:*",
     "@aethon/auth": "workspace:*",
     "@aethon/content-core": "workspace:*",
     "@aethon/db": "workspace:*",

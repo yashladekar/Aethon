@@ -191,6 +191,9 @@ importers:
 
   apps/server:
     dependencies:
+      '@aethon/ai-engine':
+        specifier: workspace:*
+        version: link:../../packages/ai-engine
       '@aethon/api':
         specifier: workspace:*
         version: link:../../packages/api
@@ -429,6 +432,9 @@ importers:
 
   packages/api:
     dependencies:
+      '@aethon/ai-engine':
+        specifier: workspace:*
+        version: link:../ai-engine
       '@aethon/auth':
         specifier: workspace:*
         version: link:../auth
