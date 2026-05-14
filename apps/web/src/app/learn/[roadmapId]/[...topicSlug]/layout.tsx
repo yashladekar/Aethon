@@ -5,6 +5,7 @@ import {
     ResizablePanel,
     ResizableHandle,
 } from "@aethon/ui/components/resizable";
+import { WorkspacePanel } from "@/components/workspace/workspace-panel";
 
 export default function WorkspaceLayout({
     children,
@@ -19,9 +20,7 @@ export default function WorkspaceLayout({
                 </ResizablePanel>
                 <ResizableHandle withHandle />
                 <ResizablePanel defaultSize={50} minSize={30}>
-                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                        <p>Interactive panel — activate via workspace tabs (Editor, Sandbox, Terminal)</p>
-                    </div>
+                    <WorkspacePanel defaultMode="editor" />
                 </ResizablePanel>
             </ResizablePanelGroup>
         </div>

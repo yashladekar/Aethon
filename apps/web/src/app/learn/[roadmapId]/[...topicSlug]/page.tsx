@@ -12,12 +12,15 @@ import {
 import { Skeleton } from "@aethon/ui/components/skeleton";
 
 import { trpc } from "@/utils/trpc";
+import { MarkdownRenderer } from "@/components/workspace/markdown-renderer";
 
 export default function TopicWorkspacePage() {
-    const params = useParams<{ roadmapId: string; topicSlug: string }>();
+    const params = useParams<{ roadmapId: string; topicSlug: string[] }>();
+
+    const topicSlug = params.topicSlug.join("/");
 
     const topic = useQuery(
-        trpc.platform.topicBySlug.queryOptions({ slug: params.topicSlug })
+        trpc.platform.topicBySlug.queryOptions({ slug: topicSlug })
     );
 
     if (topic.isLoading) {
@@ -37,7 +40,7 @@ export default function TopicWorkspacePage() {
                     <CardHeader>
                         <CardTitle>Topic not found</CardTitle>
                         <CardDescription>
-                            The topic &ldquo;{params.topicSlug}&rdquo; could not be loaded.
+                            The topic &ldquo;{topicSlug}&rdquo; could not be loaded.
                             {topic.isError && (
                                 <span className="mt-1 block text-xs text-destructive">
                                     {topic.error.message}
@@ -56,7 +59,7 @@ export default function TopicWorkspacePage() {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>{params.roadmapId}</span>
                     <span>/</span>
-                    <span>{params.topicSlug}</span>
+                    <span>{topicSlug}</span>
                 </div>
                 <h1 className="text-2xl font-semibold tracking-tight">
                     {topic.data.title}
@@ -74,7 +77,7 @@ export default function TopicWorkspacePage() {
                 </CardHeader>
                 <CardContent className="prose prose-sm dark:prose-invert max-w-none">
                     {topic.data.body ? (
-                        <div dangerouslySetInnerHTML={{ __html: topic.data.body }} />
+                        <MarkdownRenderer content={topic.data.body} />
                     ) : (
                         <p className="text-muted-foreground">
                             Topic content will be rendered here once the MDX pipeline is connected.

@@ -5,9 +5,32 @@ import dynamic from "next/dynamic";
 import { Skeleton } from "@aethon/ui/components/skeleton";
 import type { SandpackConfig } from "./sandpack-inner";
 
-const SandpackInner = dynamic(() => import("./sandpack-inner"), {
-    ssr: false,
-});
+const SandpackInner = dynamic(
+    () => import("./sandpack-inner").catch(() => {
+        // Return a fallback component if the chunk fails to load
+        return {
+            default: () => (
+                <div className="flex h-full w-full items-center justify-center p-4">
+                    <div className="text-center">
+                        <p className="text-sm font-medium text-destructive">
+                            Failed to load the sandbox environment
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            This may be a bundler compatibility issue. Try refreshing the page.
+                        </p>
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="mt-3 rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:bg-primary/90"
+                        >
+                            Reload Page
+                        </button>
+                    </div>
+                </div>
+            ),
+        };
+    }),
+    { ssr: false }
+);
 
 function SandpackSkeleton() {
     return (
@@ -62,6 +85,12 @@ function SandpackError() {
                 <p className="mt-1 text-xs text-muted-foreground">
                     Try refreshing the page
                 </p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="mt-3 rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground hover:bg-primary/90"
+                >
+                    Reload Page
+                </button>
             </div>
         </div>
     );

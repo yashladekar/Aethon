@@ -11,14 +11,20 @@ import {
 import { Skeleton } from "@aethon/ui/components/skeleton";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { authClient } from "@/lib/auth-client";
 
 export default function UserMenu() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const [mounted, setMounted] = useState(false);
 
-  if (isPending) {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || isPending) {
     return <Skeleton className="h-9 w-24" />;
   }
 
